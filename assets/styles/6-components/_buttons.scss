@@ -1,0 +1,75 @@
+/**
+ * Components - Buttons
+ *
+ * Styles for various button variants used across the application.
+ * Class prefix: .c-button
+ *
+ * Layer: Components (ITCSS)
+ */
+
+.c-button {
+  // Base button styles
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-2 $spacing-4;
+  font-family: inherit;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-normal;
+  border: none;
+  border-radius: $border-radius;
+  cursor: pointer;
+  @include transition(background-color, $transition-duration-200);
+  text-decoration: none;
+
+  // Primary variant
+  &--primary {
+    background-color: $color-primary;
+    color: $color-white;
+
+    &:hover {
+      background-color: $color-primary-dark;
+    }
+  }
+
+  // Secondary variant
+  &--secondary {
+    background-color: $color-secondary;
+    color: $color-white;
+
+    &:hover {
+      background-color: $color-secondary-dark;
+    }
+  }
+
+  // Outline variant
+  &--outline {
+    background-color: transparent;
+    border: 2px solid currentColor;
+
+    &--primary {
+      color: $color-primary;
+
+      &:hover {
+        background-color: $color-primary-light;
+      }
+    }
+
+    &--secondary {
+      color: $color-secondary;
+
+      &:hover {
+        background-color: $color-secondary-light;
+      }
+    }
+  }
+
+  // Disabled state
+  &--disabled {
+    background-color: $color-gray-400;
+    color: $color-gray-700;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}

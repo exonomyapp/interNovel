@@ -1,0 +1,11 @@
+{
+  "extends": "../.nuxt/tsconfig.server.json",
+  "compilerOptions": {
+    "baseUrl": "../",
+    "paths": {
+      "@github/*": ["server/github/*"],
+      "@api/*": ["server/api/*"],
+      "@db/*": ["server/db/*"]
+    }
+  }
+}

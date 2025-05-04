@@ -1,0 +1,82 @@
+/**
+ * Components - Issue Tree
+ *
+ * Styles for the hierarchical issue tree visualization used in navigation.
+ * Includes expand/collapse toggles, node styling, child connections,
+ * and state modifiers (active, completed).
+ * Class prefix: .c-issue-tree
+ *
+ * Layer: Components (ITCSS)
+ */
+
+// Root tree container
+.c-issue-tree {
+  // Reset default list styles
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// Individual tree node
+.c-issue-tree__node {
+  position: relative;
+  padding: $spacing-2 $spacing-4;
+  cursor: pointer;
+  @include transition(background-color, $transition-duration-150);
+
+  &:hover {
+    background-color: $color-gray-100;
+  }
+}
+
+// Label inside a node
+.c-issue-tree__label {
+  display: inline-block;
+  font-size: $font-size-base;
+  color: $color-gray-800;
+  @include truncate(); // Prevent overflow text
+}
+
+// Expand/collapse toggle icon
+.c-issue-tree__toggle {
+  position: absolute;
+  left: $spacing-1;
+  top: 50%;
+  transform: translateY(-50%);
+  width: $spacing-3;
+  height: $spacing-3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-sm;
+  color: $color-gray-600;
+
+  &:hover {
+    color: $color-gray-800;
+  }
+}
+
+// Nested children list
+.c-issue-tree__children {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 $spacing-6;
+}
+
+// Active (selected) node state
+.c-issue-tree__node--active {
+  background-color: $color-primary-light;
+
+  .c-issue-tree__label {
+    color: $color-primary-dark;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+// Completed node state
+.c-issue-tree__node--completed {
+  .c-issue-tree__label {
+    text-decoration: line-through;
+    color: $color-gray-500;
+  }
+}

@@ -1,0 +1,182 @@
+/**
+ * Mixins
+ *
+ * This file contains globally used Sass mixins which provide reusable style patterns.
+ * Mixins allow us to abstract complex CSS into reusable functions, reducing repetition
+ * and making our stylesheets more maintainable.
+ */
+
+/**
+ * Responsive breakpoint manager
+ * @param {String} $breakpoint - The breakpoint name (xs, sm, md, lg, xl)
+ * @content - The styles to be applied within the media query
+ *
+ * Usage: 
+ * @include respond-to(md) {
+ *   // Styles for medium screens and up
+ * }
+ */
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == xs {
+    @media (min-width: $breakpoint-xs) { @content; }
+  } @else if $breakpoint == sm {
+    @media (min-width: $breakpoint-sm) { @content; }
+  } @else if $breakpoint == md {
+    @media (min-width: $breakpoint-md) { @content; }
+  } @else if $breakpoint == lg {
+    @media (min-width: $breakpoint-lg) { @content; }
+  } @else if $breakpoint == xl {
+    @media (min-width: $breakpoint-xl) { @content; }
+  }
+}
+
+/**
+ * Flexbox container
+ * @param {String} $direction - The flex direction (row, column, etc.)
+ * @param {String} $justify - The justify-content value
+ * @param {String} $align - The align-items value
+ * @param {String} $wrap - The flex-wrap value
+ *
+ * Usage:
+ * @include flex(row, center, center);
+ */
+@mixin flex($direction: row, $justify: flex-start, $align: stretch, $wrap: nowrap) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+  flex-wrap: $wrap;
+}
+
+/**
+ * Grid container
+ * @param {String} $columns - The grid-template-columns value
+ * @param {String} $rows - The grid-template-rows value
+ * @param {String} $gap - The gap between grid items
+ *
+ * Usage:
+ * @include grid(repeat(3, 1fr), auto, $spacing-4);
+ */
+@mixin grid($columns: 1fr, $rows: auto, $gap: 0) {
+  display: grid;
+  grid-template-columns: $columns;
+  grid-template-rows: $rows;
+  gap: $gap;
+}
+
+/**
+ * Box shadow variations
+ * @param {String} $elevation - The shadow elevation level (sm, md, lg, xl)
+ *
+ * Usage:
+ * @include elevation(md);
+ */
+@mixin elevation($level: md) {
+  @if $level == sm {
+    box-shadow: $box-shadow-sm;
+  } @else if $level == md {
+    box-shadow: $box-shadow-md;
+  } @else if $level == lg {
+    box-shadow: $box-shadow-lg;
+  } @else if $level == xl {
+    box-shadow: $box-shadow-xl;
+  } @else if $level == inner {
+    box-shadow: $box-shadow-inner;
+  } @else {
+    box-shadow: $box-shadow;
+  }
+}
+
+/**
+ * Truncate text with ellipsis
+ * Shortens text with an ellipsis when it overflows its container
+ *
+ * Usage:
+ * @include truncate();
+ */
+@mixin truncate() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/**
+ * Typography preset
+ * @param {String} $size - The font size variable name
+ * @param {Number} $weight - The font weight value
+ * @param {Number} $line-height - The line height value
+ *
+ * Usage:
+ * @include typography(lg, $font-weight-bold, $line-height-tight);
+ */
+@mixin typography($size: base, $weight: $font-weight-normal, $line-height: $line-height-normal) {
+  @if $size == xs {
+    font-size: $font-size-xs;
+  } @else if $size == sm {
+    font-size: $font-size-sm;
+  } @else if $size == base {
+    font-size: $font-size-base;
+  } @else if $size == md {
+    font-size: $font-size-md;
+  } @else if $size == lg {
+    font-size: $font-size-lg;
+  } @else if $size == xl {
+    font-size: $font-size-xl;
+  } @else if $size == 2xl {
+    font-size: $font-size-2xl;
+  } @else if $size == 3xl {
+    font-size: $font-size-3xl;
+  } @else if $size == 4xl {
+    font-size: $font-size-4xl;
+  }
+  
+  font-weight: $weight;
+  line-height: $line-height;
+}
+
+/**
+ * Apply transitions
+ * @param {String} $properties - The properties to transition
+ * @param {Number} $duration - The transition duration
+ * @param {String} $timing - The timing function
+ *
+ * Usage:
+ * @include transition(all, $transition-duration-200, ease-in-out);
+ */
+@mixin transition($properties: all, $duration: $transition-duration-200, $timing: ease-in-out) {
+  transition-property: $properties;
+  transition-duration: $duration;
+  transition-timing-function: $timing;
+}
+
+/**
+ * Visually hide an element while keeping it accessible to screen readers
+ *
+ * Usage:
+ * @include visually-hidden();
+ */
+@mixin visually-hidden() {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/**
+ * Clearfix - clear floats
+ *
+ * Usage:
+ * @include clearfix();
+ */
+@mixin clearfix() {
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}

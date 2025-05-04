@@ -1,0 +1,47 @@
+/**
+ * Components - Cards
+ *
+ * Styles for card component used to display contained information blocks.
+ * Class prefix: .c-card
+ *
+ * Layer: Components (ITCSS)
+ */
+
+.c-card {
+  // Base card container with background, border, shadow, and padding
+  background-color: $color-white;
+  border: 1px solid $color-gray-200;
+  border-radius: $border-radius;
+  @include elevation(sm);
+  padding: $spacing-4;
+  margin-bottom: $spacing-4;
+  display: flex;
+  flex-direction: column;
+  
+  // Header section for card title and actions
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-3;
+    
+    h4 {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-medium;
+      margin: 0;
+    }
+  }
+
+  // Body section for main content
+  &__body {
+    flex: 1;
+    margin-bottom: $spacing-3;
+  }
+
+  // Footer section for actions
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-2;
+  }
+}

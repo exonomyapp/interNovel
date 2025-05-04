@@ -1,0 +1,65 @@
+/**
+ * Main SCSS Entry File
+ * 
+ * This file organizes our CSS imports according to the ITCSS methodology
+ * (Inverted Triangle CSS) which helps manage CSS specificity by ordering
+ * styles from least specific to most specific.
+ *
+ * Key benefits of this approach:
+ * - Manages the cascade and specificity conflicts
+ * - Creates a logical and scalable structure
+ * - Makes styles more maintainable and predictable
+ * - Reduces CSS bloat and encourages reuse
+ */
+
+/* 1. Settings - Variables and configuration 
+ * Contains global variables, config switches, brand colors, etc.
+ * No actual CSS output is generated from this layer.
+ */
+@import '1-settings/variables';
+
+/* 2. Tools - Mixins and functions
+ * Contains globally used mixins and functions.
+ * Like settings, no CSS is generated from this layer.
+ */
+@import '2-tools/mixins';
+
+/* 3. Generic - Reset/normalize styles
+ * First layer that generates actual CSS.
+ * Contains resets, normalize.css, box-sizing rules, etc.
+ * This layer affects a wide range of elements in a global way.
+ */
+@import '3-generic/reset';
+
+/* 4. Elements - Styling for bare HTML elements (h1, a, etc.)
+ * Default styling for HTML elements; h1-h6, links, lists, etc.
+ * These are unopinionated styles that define what elements look like without classes.
+ */
+@import '4-elements/typography';
+
+/* 5. Objects - Non-cosmetic design patterns
+ * Class-based selectors that define undecorated design patterns.
+ * Example: .o-layout for grid systems, .o-container for wrappers, etc.
+ * Follows OOCSS (Object-Oriented CSS) principles.
+ */
+@import '5-objects/layout';
+
+/* 6. Components - Specific UI components
+ * Specific, styled pieces of UI. This is where most of your styles will live.
+ * Each component should be fully styled in its own file with minimal dependencies.
+ * Class names typically start with .c- (e.g., .c-card, .c-button).
+ */
+@import '6-components/cards';
+@import '6-components/issue-tree';
+@import '6-components/forms';
+@import '6-components/buttons';
+@import '6-components/actions';
+@import '6-components/users';
+@import '6-components/layout-default';
+
+/* 7. Utilities - Helper classes with high specificity
+ * Utility and helper classes with !important flags.
+ * Classes to override and adjust specific behaviors as needed.
+ * Examples: .u-hidden, .u-text-center, etc.
+ */
+@import '7-utilities/helpers';
