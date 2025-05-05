@@ -1,25 +1,7 @@
 import { H3Event, getQuery, readBody, setResponseStatus } from 'h3';
 import { createIssue, getIssue, fetchIssues, updateIssue, enhanceIssueReferences, fetchComments, createComment, updateComment, deleteComment, deleteIssue } from '../github';
 import { db, Issue, Comment } from '../db';
-
-// Define a logger function to standardize logging across the API
-const logger = {
-  info: (message: string, data?: any) => {
-    console.info(`[API INFO] ${message}`, data ? data : '');
-  },
-  error: (message: string, error: any) => {
-    console.error(`[API ERROR] ${message}`, error);
-    // In production, you might want to log to a monitoring service here
-  },
-  warn: (message: string, data?: any) => {
-    console.warn(`[API WARNING] ${message}`, data ? data : '');
-  },
-  debug: (message: string, data?: any) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.debug(`[API DEBUG] ${message}`, data ? data : '');
-    }
-  }
-};
+import { serverLogger as logger } from '../utils/logger';
 
 // Define error response helper for consistent error responses
 const apiError = (event: H3Event, statusCode: number, message: string, error?: any) => {

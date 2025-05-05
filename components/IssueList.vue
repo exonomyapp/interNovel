@@ -251,116 +251,38 @@ onMounted(() => {
     </v-card>
     
     <!-- Issues list -->
-    <div v-else class="issues-container" :style="{ maxHeight: props.maxHeight, overflow: props.maxHeight ? 'auto' : 'visible' }">
-      <v-card
+    <v-list density="compact" class="pa-0">
+      <v-list-item
         v-for="issue in filteredIssues"
         :key="issue.id"
-        class="mb-3 issue-card"
-        :class="{ 'automation-issue': issue.isAutomation }"
-        variant="outlined"
+        :value="issue"
         @click="viewIssue(issue)"
+        :class="{
+          'border-l-4 border-purple': issue.isAutomation
+        }"
+        hover
       >
-        <v-card-item>
-          <!-- Issue title with issue number -->
-          <div class="d-flex align-center mb-2">
-            <!-- Automation indicator icon -->
-            <v-icon 
-              v-if="issue.isAutomation" 
-              :color="getStatusColor(issue.automationStatus)"
-              :icon="getStatusIcon(issue.automationStatus)"
-              class="mr-2"
-              size="small"
-            ></v-icon>
-            
-            <v-card-title class="text-h6 pa-0">
-              #{{ issue.number }}: {{ issue.title }}
-            </v-card-title>
-          </div>
-          
-          <!-- Issue metadata -->
-          <v-card-subtitle class="pa-0 pt-1">
-            <span>Created: {{ formatDate(issue.created_at) }}</span>
-            <span class="mx-2">|</span>
-            <span>Updated: {{ formatDate(issue.updated_at) }}</span>
-            <span class="mx-2">|</span>
-            <span class="text-capitalize">State: {{ issue.state }}</span>
-          </v-card-subtitle>
-          
-          <!-- Issue labels -->
-          <div class="d-flex flex-wrap mt-2">
-            <v-chip
-              v-for="label in issue.labels"
-              :key="label"
-              size="small"
-              class="mr-1 mb-1"
-              :color="label === 'automation' || label === 'ai-task' ? 'purple' : undefined"
-              variant="outlined"
-            >
-              {{ label }}
-            </v-chip>
-          </div>
-          
-          <!-- Automation metadata if applicable -->
-          <div v-if="issue.isAutomation" class="automation-metadata mt-3 pa-2">
-            <div class="d-flex align-center">
-              <v-icon icon="mdi-robot" class="mr-2" size="small"></v-icon>
-              <span class="text-subtitle-2">AI Automation Task</span>
-              
-              <v-chip
-                v-if="issue.automationPriority"
-                size="x-small"
-                class="ml-auto"
-                :color="getPriorityColor(issue.automationPriority)"
-              >
-                {{ issue.automationPriority }} priority
-              </v-chip>
-            </div>
-            
-            <!-- Progress bar -->
-            <div v-if="issue.automationStatus !== 'pending'" class="mt-2">
-              <div class="d-flex align-center">
-                <span class="text-caption">Progress:</span>
-                <span class="text-caption ml-auto">{{ issue.automationProgress || 0 }}%</span>
-              </div>
-              <v-progress-linear
-                :model-value="issue.automationProgress || 0"
-                :color="getStatusColor(issue.automationStatus)"
-                height="8"
-              ></v-progress-linear>
-            </div>
-            
-            <!-- Status chip -->
-            <v-chip
-              size="small"
-              class="mt-2"
-              :color="getStatusColor(issue.automationStatus)"
-            >
-              {{ issue.automationStatus || 'pending' }}
-            </v-chip>
-          </div>
-        </v-card-item>
-      </v-card>
-    </div>
+        <template v-slot:prepend>
+          <v-icon :color="getStatusColor(issue.automationStatus)" size="small">
+            {{ getStatusIcon(issue.automationStatus) }}
+          </v-icon>
+        </template>
+
+        <v-list-item-title class="d-flex align-center">
+          <span class="text-body-2">#{{ issue.number }}</span>
+          <span class="text-body-2 ml-2">{{ issue.title }}</span>
+        </v-list-item-title>
+
+        <template v-slot:append>
+          <v-chip
+            v-if="issue.isAutomation"
+            size="x-small"
+            color="purple"
+          >
+            AI
+          </v-chip>
+        </template>
+      </v-list-item>
+    </v-list>
   </div>
 </template>
-
-<style scoped>
-.automation-issue {
-  border-left: 4px solid #9c27b0 !important;
-}
-
-.automation-metadata {
-  background-color: rgba(156, 39, 176, 0.05);
-  border-radius: 4px;
-}
-
-.issue-card {
-  cursor: pointer;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.issue-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-  transform: translateY(-2px);
-}
-</style>

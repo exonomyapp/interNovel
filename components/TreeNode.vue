@@ -2,11 +2,7 @@
 <template>
   <div class="tree-item">
     <!-- Node content with toggle button -->
-    <div 
-      class="tree-item-content" 
-      :class="{ 'selected': isSelected }"
-      @click="selectNode"
-    >
+    <div class="tree-item-content">
       <v-btn
         v-if="node.children && node.children.length > 0"
         icon="mdi-chevron-right"
@@ -43,8 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject } from 'vue';
-import { useEventBus, EVENTS } from '../composables/useEventBus';
+import { ref } from 'vue';
 
 // Define props for the node
 interface Props {
@@ -58,32 +53,12 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// Setup event bus
-const { emit: emitEvent } = useEventBus();
-
 // Track if node is expanded
 const expanded = ref(false);
-
-// Track the currently selected node
-const selectedNodeId = inject<any>('selectedNodeId', ref(null));
-
-// Computed property to check if this node is selected
-const isSelected = computed(() => {
-  return selectedNodeId.value === props.node.id;
-});
 
 // Toggle expanded state
 const toggleExpand = () => {
   expanded.value = !expanded.value;
-};
-
-// Select this node without navigating away
-const selectNode = () => {
-  // Update selected node id
-  selectedNodeId.value = props.node.id;
-  
-  // Emit event with the selected issue
-  emitEvent(EVENTS.ISSUE_SELECTED, props.node);
 };
 </script>
 

@@ -36,6 +36,10 @@ The User Navbar includes GitHub authentication:
 - User profile dropdown showing GitHub avatar and username
 - User-centric filtering of issues based on GitHub identity
 
+### CSS Grid Enforcement
+
+The application now enforces the use of CSS Grid for all major UI components. Flexbox is reserved for micro-componentry. The main layout has been updated to use CSS Grid, with defined grid areas for the header, sidebar, and main content.
+
 ## Implementation Status and Task List
 
 ### 1. **Application Foundation**

@@ -39,7 +39,7 @@ const { emit } = useEventBus();
 const theme = useTheme();
 
 // Theme state
-const darkMode = ref(false);
+const darkMode = ref(true);
 
 // Actions
 const reloadData = () => {

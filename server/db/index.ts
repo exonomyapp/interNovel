@@ -17,21 +17,33 @@ export interface Comment { // Ensure this is exported
   keywords?: string;
 }
 
+export interface LogEntry {
+  id?: number;
+  timestamp: string;
+  type: 'info' | 'error' | 'warning' | 'debug';
+  message: string;
+  details?: any;
+  source: string;
+}
+
 // Define the Dexie database class
 class GitHubIssueDatabase extends Dexie {
   // Declare table properties without the '!' definite assignment assertion
   issues: Table<Issue, number>;
   comments: Table<Comment, number>;
+  logs: Table<LogEntry, number>;
 
   constructor() {
     super('GitHubIssueDatabase');
-    this.version(2).stores({
+    this.version(3).stores({
       issues: 'id, number, title, author, state, createdAt, updatedAt, parentId, automationStatus, automationPriority, *keywords, *labels',
       comments: 'id, issueId, author, createdAt, updatedAt, *keywords',
+      logs: '++id, timestamp, type, source'
     });
     // Initialize table properties after defining stores
     this.issues = this.table('issues');
     this.comments = this.table('comments');
+    this.logs = this.table('logs');
   }
 }
 
@@ -41,13 +53,25 @@ export const db = new GitHubIssueDatabase(); // Ensure this is exported
 // --- Basic Data Handling Functions ---
 
 // Add or update multiple issues
-export async function upsertIssues(issues: Issue[]) { // Ensure this is exported
-  // ...existing code...
+export async function upsertIssues(issues: Issue[]) {
+  try {
+    await db.issues.bulkPut(issues);
+    console.log(`Upserted ${issues.length} issues`);
+  } catch (error) {
+    console.error('Error upserting issues:', error);
+    throw error;
+  }
 }
 
 // Add or update multiple comments
-export async function upsertComments(comments: Comment[]) { // Ensure this is exported
-  // ...existing code...
+export async function upsertComments(comments: Comment[]) {
+  try {
+    await db.comments.bulkPut(comments);
+    console.log(`Upserted ${comments.length} comments`);
+  } catch (error) {
+    console.error('Error upserting comments:', error);
+    throw error;
+  }
 }
 
 // Get all issues (consider pagination for large datasets)
@@ -82,6 +106,45 @@ export async function searchIssues(query: string): Promise<Issue[]> { // Ensure 
   } catch (error) {
     console.error(`Error searching issues with query "${query}":`, error);
     return []; // Return empty array on error
+  }
+}
+
+// Add logging functions
+export async function addLogEntry(entry: Omit<LogEntry, 'id'>) {
+  try {
+    const id = await db.logs.add(entry);
+    return id;
+  } catch (error) {
+    console.error('Error adding log entry:', error);
+    throw error;
+  }
+}
+
+export async function getLogs(limit = 100, offset = 0): Promise<LogEntry[]> {
+  try {
+    return await db.logs
+      .orderBy('timestamp')
+      .reverse()
+      .offset(offset)
+      .limit(limit)
+      .toArray();
+  } catch (error) {
+    console.error('Error getting logs:', error);
+    return [];
+  }
+}
+
+export async function clearOldLogs(daysToKeep = 7) {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
+  
+  try {
+    await db.logs
+      .where('timestamp')
+      .below(cutoffDate.toISOString())
+      .delete();
+  } catch (error) {
+    console.error('Error clearing old logs:', error);
   }
 }
 

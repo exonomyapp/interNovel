@@ -49,7 +49,7 @@
         <!-- Left sidebar -->
         <aside class="x-sidebar">
           <div class="sidebar-content">
-            <!-- User authentication section -->
+            <!-- User controls at top -->
             <section class="sidebar-section">
               <Users 
                 :isAuthenticated="isAuthenticated" 
@@ -57,9 +57,11 @@
                 @settings="showSettings" 
               />
             </section>
+
+            <v-spacer></v-spacer>
             
-            <!-- Actions component positioned at the bottom -->
-            <section class="sidebar-section actions-section">
+            <!-- Actions at bottom -->
+            <section class="sidebar-section">
               <Actions />
             </section>
           </div>
@@ -126,4 +128,44 @@ onMounted(() => {
 });
 </script>
 
-<!-- Removed <style scoped> block; styles are now in assets/styles/6-components/_layout-default.scss -->
+<style scoped>
+.x-style-app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.x-main-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  height: 100%;
+}
+
+.x-sidebar {
+  border-right: 1px solid rgba(0,0,0,0.12);
+  background: rgb(var(--v-theme-surface));
+  height: 100%;
+  overflow-y: auto;
+}
+
+.x-main-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sidebar-content {
+  height: 100%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-section {
+  margin-bottom: 16px;
+}
+
+.sidebar-section:last-child {
+  margin-bottom: 0;
+}
+</style>

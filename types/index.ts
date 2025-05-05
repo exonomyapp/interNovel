@@ -13,24 +13,14 @@ export interface Issue {
   id: number;
   number: number;
   title: string;
-  author: string;
-  state: 'open' | 'closed';
-  createdAt: string;
-  updatedAt: string;
-  parentId?: number;
   body?: string;
-  keywords?: string;
+  state: 'open' | 'closed';
   labels?: string[];
-  
-  // Automation-specific fields
-  automationStatus?: 'pending' | 'in-progress' | 'completed' | 'failed' | 'paused';
-  automationProgress?: AutomationStep[];
-  automationLogs?: string[];
-  automationPriority?: 'low' | 'medium' | 'high' | 'critical';
-  automationStartTime?: string;
-  automationEndTime?: string;
-  automationEstimatedTime?: number; // in minutes
-  automationActualTime?: number; // in minutes
+  author?: string;
+  parentId?: number;
+  automationStatus?: string;
+  automationProgress?: number;
+  keywords?: string[];  // Add keywords array for search functionality
 }
 
 export interface Comment {

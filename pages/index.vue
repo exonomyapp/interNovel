@@ -1,168 +1,34 @@
 <template>
-  <div class="x-style-content">
-    <!-- Panel 1: Issues Tree -->
-    <section class="panel tree-panel">
-      <!-- Issue Tree Navigation -->
-      <TreeNav ref="treeNavComponent" @issue-selected="handleIssueSelected" />
-      
-      <!-- New Issue Button -->
-      <v-btn 
-        block
-        color="primary" 
-        class="new-issue-button mt-3"
-        prepend-icon="mdi-plus" 
-        @click="toggleCreateForm"
-        variant="tonal"
-      >
-        {{ showCreateForm ? 'Hide Form' : 'New Issue' }}
-      </v-btn>
-      
-      <!-- Create Issue Form (collapsible) -->
-      <v-expand-transition>
-        <div v-if="showCreateForm" class="create-issue-form mt-3">
-          <v-card>
-            <v-card-title class="d-flex align-center">
-              <span>Create New Issue</span>
-              <v-spacer></v-spacer>
-              <v-btn icon @click="showCreateForm = false">
-                <v-icon>mdi-close</v-icon>
-              </v-btn>
-            </v-card-title>
-            <v-card-text>
-              <CreateIssueForm @issue-created="onIssueCreated" />
-            </v-card-text>
-          </v-card>
-        </div>
-      </v-expand-transition>
-    </section>
+  <div class="page-grid">
+    <!-- Panel 1: Issues List (Tree) -->
+    <div class="panel panel-tree">
+      <tree-nav ref="treeNavComponent" @issue-selected="handleIssueSelected" />
+    </div>
     
     <!-- Panel 2: Issue Details -->
-    <section class="panel details-panel">
-      <div class="section-header">
-        <h2>Issue Details</h2>
-        <v-btn 
-          v-if="selectedIssue"
-          icon
-          variant="text"
-          color="primary"
-          size="small"
-          :href="`https://github.com/owner/repo/issues/${selectedIssue.number}`"
-          target="_blank"
-          title="View on GitHub"
-        >
-          <v-icon>mdi-github</v-icon>
-        </v-btn>
-      </div>
-      
-      <div v-if="selectedIssue" class="selected-issue-details">
+    <div class="panel panel-details">
+      <v-card v-if="selectedIssue" class="h-100">
         <IssueDetail :issue="selectedIssue" />
-      </div>
-      
-      <div v-else class="no-issue-selected">
-        <v-alert type="info" density="compact">
-          Select an issue from the tree to view details
-        </v-alert>
-      </div>
-    </section>
-    
-    <!-- Panel 3: Comments -->
-    <section class="panel comments-panel">
-      <div class="section-header">
-        <h2>Comments</h2>
-        <v-btn
-          v-if="selectedIssue && comments.length > 0"
-          size="small"
-          variant="text"
-          color="primary"
-          @click="fetchComments(selectedIssue.number)"
-          title="Refresh comments"
-        >
-          <v-icon size="small">mdi-refresh</v-icon>
-        </v-btn>
-      </div>
-      
-      <div v-if="!selectedIssue" class="no-issue-selected">
-        <v-alert type="info" density="compact">
-          Select an issue to view comments
-        </v-alert>
-      </div>
-      
-      <div v-else-if="isLoadingComments" class="loading-comments">
-        <v-progress-circular indeterminate color="primary" size="24"></v-progress-circular>
-        <span class="ml-2 text-caption">Loading comments...</span>
-      </div>
-      
-      <div v-else-if="comments.length > 0" class="comments-list">
-        <v-card
-          v-for="comment in comments"
-          :key="comment.id"
-          class="mb-2"
-          variant="outlined"
-          density="compact"
-        >
-          <v-card-item class="pa-2">
-            <template v-slot:prepend>
-              <v-avatar size="24">
-                <v-img :src="getAvatarUrl(comment.author)" alt="Comment author"></v-img>
-              </v-avatar>
-            </template>
-            
-            <v-card-title class="text-body-2 d-flex justify-space-between align-center pa-0">
-              <span>{{ comment.author }}</span>
-              <span class="text-caption">{{ formatDate(comment.createdAt) }}</span>
-            </v-card-title>
-          </v-card-item>
-          
-          <v-divider></v-divider>
-          
-          <v-card-text class="py-2 px-3 text-body-2">
-            <div class="comment-body">{{ comment.body }}</div>
-          </v-card-text>
-          
-          <v-card-actions v-if="comment.author === currentUser" class="py-1 px-2">
-            <v-spacer></v-spacer>
-            <v-btn size="x-small" variant="text" color="error" density="compact">
-              Delete
-            </v-btn>
-            <v-btn size="x-small" variant="text" color="primary" density="compact">
-              Edit
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </div>
-      
-      <div v-else class="no-comments">
-        <v-alert type="info" class="text-caption" density="compact">
-          No comments on this issue yet
-        </v-alert>
-      </div>
-      
-      <!-- Add comment form -->
-      <div v-if="selectedIssue" class="add-comment-section mt-2">
-        <v-textarea
-          v-model="newComment"
-          label="Add a comment"
-          rows="2"
-          variant="outlined"
-          hide-details
-          density="compact"
-          class="text-caption"
-        ></v-textarea>
-        
-        <div class="d-flex justify-end mt-2">
-          <v-btn
-            color="primary"
-            size="small"
-            density="compact"
-            :disabled="!newComment.trim() || isSubmittingComment"
-            @click="submitComment"
-          >
-            <v-icon v-if="isSubmittingComment" icon="mdi-loading" class="loading-icon mr-1" size="small"></v-icon>
-            <span>{{ isSubmittingComment ? 'Submitting...' : 'Submit' }}</span>
-          </v-btn>
-        </div>
-      </div>
-    </section>
+      </v-card>
+      <v-card v-else class="h-100 d-flex align-center justify-center">
+        <span class="text-medium-emphasis">Select an issue to view details</span>
+      </v-card>
+    </div>
+
+    <!-- Panel 3: Comments Section -->
+    <div class="panel panel-comments">
+      <v-card v-if="selectedIssue" class="h-100">
+        <comments-section :issue="selectedIssue" />
+      </v-card>
+      <v-card v-else class="h-100 d-flex align-center justify-center">
+        <span class="text-medium-emphasis">Select an issue to view comments</span>
+      </v-card>
+    </div>
+
+    <!-- Panel 4: Logs -->
+    <div class="panel panel-logs">
+      <log-viewer />
+    </div>
   </div>
 </template>
 
@@ -170,32 +36,14 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useEventBus, EVENTS } from '../composables/useEventBus';
 import TreeNav from '../components/TreeNav.vue';
+import IssueDetail from '../components/IssueDetail.vue';
+import CommentsSection from '../components/CommentsSection.vue';
+import LogViewer from '../components/LogViewer.vue';
+import type { Issue, Comment } from '../types';
 import { useTheme } from 'vuetify';
 
-// Types
-interface Issue {
-  id: number;
-  number: number;
-  title: string;
-  body: string;
-  state: 'open' | 'closed';
-  author: string;
-  created_at: string;
-  updated_at: string;
-  labels: string[];
-}
-
-interface Comment {
-  id: number;
-  issueNumber: number;
-  author: string;
-  body: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// Component refs
-const treeNavComponent = ref<any>(null);
+// Fix component ref typing
+const treeNavComponent = ref<InstanceType<typeof TreeNav> | null>(null);
 const theme = useTheme();
 
 // UI state
@@ -204,6 +52,7 @@ const showComments = ref(false);
 
 // Data state
 const selectedIssue = ref<Issue | null>(null);
+const currentIssueId = ref<number | null>(null);
 const comments = ref<Comment[]>([]);
 const isLoadingComments = ref(false);
 const newComment = ref('');
@@ -222,26 +71,28 @@ const toggleCreateForm = () => {
 };
 
 // Handlers
-const handleIssueSelected = async (issue: Issue) => {
+const handleIssueSelected = (issue: Issue | null) => {
+  console.log('Index: Handling issue selection:', issue);
+  if (!issue) {
+    selectedIssue.value = null;
+    return;
+  }
+
   selectedIssue.value = issue;
-  newComment.value = '';
-  
-  if (issue) {
-    await fetchComments(issue.number);
-    // Auto-show comments when issue is selected
-    showComments.value = true;
+  if (issue.number) {
+    void fetchComments(issue.number);
   }
 };
 
-const onIssueCreated = (issue: Issue) => {
-  showCreateForm.value = false;
-  emit(EVENTS.RELOAD_DATA);
-  // Optionally select the newly created issue
-  handleIssueSelected(issue);
-};
+// Add flag to prevent duplicate fetches
+const isFetchingComments = ref(false);
 
 // API calls
 const fetchComments = async (issueNumber: number) => {
+  // Prevent concurrent fetches
+  if (isFetchingComments.value) return;
+
+  isFetchingComments.value = true;
   isLoadingComments.value = true;
   comments.value = [];
   
@@ -257,6 +108,7 @@ const fetchComments = async (issueNumber: number) => {
     console.error('Error fetching comments:', error);
   } finally {
     isLoadingComments.value = false;
+    isFetchingComments.value = false;
   }
 };
 
@@ -332,32 +184,22 @@ const getLabelColor = (label: string) => {
 
 // Event subscriptions
 onMounted(() => {
-  // Listen for issue selection events from other components
-  unsubscribes.push(on(EVENTS.ISSUE_SELECTED, handleIssueSelected));
-  
-  // Listen for create form trigger
-  unsubscribes.push(on(EVENTS.SHOW_CREATE_FORM, () => {
-    showCreateForm.value = true;
-  }));
-  
-  // Listen for refresh events
-  unsubscribes.push(on(EVENTS.RELOAD_DATA, () => {
-    if (treeNavComponent.value) {
-      // Refresh the tree nav component
-      treeNavComponent.value.reload();
-
-      // Clear the form
-    }
-    
-    if (selectedIssue.value) {
-      fetchComments(selectedIssue.value.number);
-    }
-  }));
+  unsubscribes = [
+    on(EVENTS.SHOW_CREATE_FORM, () => {
+      showCreateForm.value = true;
+    }),
+    on(EVENTS.RELOAD_DATA, () => {
+      if (treeNavComponent.value?.reload) {
+        treeNavComponent.value.reload();
+      }
+    })
+  ];
 });
 
 // Clean up event listeners
 onUnmounted(() => {
   unsubscribes.forEach(unsubscribe => unsubscribe());
+  unsubscribes = [];
 });
 
 // Page meta
@@ -367,164 +209,34 @@ useHead({
 </script>
 
 <style scoped>
-/* X.com-inspired styling */
-.x-style-content {
-  display: flex;
-  flex-direction: column;
+.page-grid {
+  display: grid;
+  grid-template-rows: 3fr 3fr 4fr 2fr;
   gap: 16px;
-  height: calc(100vh - 64px); /* Adjust for header */
   padding: 16px;
-  max-width: 1500px;
-  margin: 0 auto;
+  height: calc(100vh - 64px); /* Account for header */
 }
 
-/* Panel styling */
 .panel {
-  padding: 12px;
-  border-radius: 16px;
-  background-color: rgb(var(--v-theme-surface));
-  border: 1px solid rgba(var(--v-border-opacity), 0.12);
   overflow-y: auto;
+  min-height: 0; /* Important for scroll behavior */
+  background: rgb(var(--v-theme-surface));
+  border-radius: 4px;
 }
 
-/* Panel sizes */
-.tree-panel {
-  height: 35%; /* Top panel */
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-}
-
-.details-panel {
-  height: 35%; /* Middle panel */
+.panel-tree {
   min-height: 200px;
 }
 
-.comments-panel {
-  height: 30%; /* Bottom panel */
+.panel-details {
+  min-height: 200px;
+}
+
+.panel-comments {
+  min-height: 200px;
+}
+
+.panel-logs {
   min-height: 150px;
-}
-
-/* Section headers */
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-h2 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(var(--v-border-opacity), 0.08);
-}
-
-/* Make cards more compact, X.com style */
-.selected-issue-card {
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-/* Issue body content */
-.issue-body-content {
-  max-height: none;
-  overflow-y: visible;
-}
-
-.issue-body {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  font-size: 14px;
-}
-
-.no-description {
-  color: rgba(var(--v-theme-on-surface), 0.6);
-  font-style: italic;
-}
-
-/* Empty states */
-.no-issue-selected, .no-comments {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-grow: 1;
-  padding: 24px;
-}
-
-/* Comments list */
-.comments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow-y: auto;
-  max-height: calc(100% - 120px); /* Leave space for the comment form */
-}
-
-.comment-body {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  font-size: 14px;
-}
-
-/* Loading states */
-.loading-comments {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-}
-
-.loading-icon {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* New issue button and comments toggle */
-.new-issue-button {
-  border-radius: 20px;
-  margin: 8px 0;
-}
-
-/* Add comment section */
-.add-comment-section {
-  margin-top: 12px;
-  border-top: 1px solid rgba(var(--v-border-opacity), 0.08);
-  padding-top: 12px;
-}
-
-/* Responsive adjustments */
-@media (min-width: 1200px) {
-  .x-style-content {
-    height: calc(100vh - 64px);
-  }
-}
-
-@media (max-width: 960px) {
-  .x-style-content {
-    height: auto;
-    min-height: calc(100vh - 64px);
-  }
-  
-  .panel {
-    height: auto;
-  }
-  
-  .tree-panel {
-    min-height: 300px;
-  }
-  
-  .details-panel {
-    min-height: 300px;
-  }
-  
-  .comments-panel {
-    min-height: 300px;
-  }
 }
 </style>
