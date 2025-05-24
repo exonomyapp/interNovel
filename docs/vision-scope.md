@@ -59,11 +59,12 @@ MVP1 will focus on delivering a core set of features that establish InterNovel's
 #### 4.3. The "Novel Spine": Flexible Story Structuring
 
 *   **Idea-Centric Organization:** Authors can construct a "Novel Spine" composed of "Vertebrae," where each Vertebra represents a core idea, plot point, scene concept, or thematic element, rather than a finalized block of text.
+*   **Manual Time Stamping:** Vertebrae can be manually time stamped to establish an inherent chronological framework for the narrative.
 *   **Tagging & Categorization:** Vertebrae can be tagged with relevant **themes** and **topics** to aid in organization and analysis.
-*   **Non-Linear Development:** This allows authors to build the foundational skeleton of their novel in a non-sequential manner, capturing ideas as they emerge.
+*   **Non-Linear Development:** This allows authors to build the foundational skeleton of their novel in a non-sequential manner, capturing ideas as they emerge, while the time stamps maintain the underlying chronology.
 *   **Fleshing Out Ideas:** Authors can associate detailed notes, draft snippets of text, character involvements, or research materials with each Vertebra, "fleshing out" that part of the story at their own pace.
-*   **Dynamic Storyline & Section Creation:** Once Vertebrae are established, authors can arrange and rearrange them to experiment with different chronological sequences, complex interwoven storylines, and define logical **sections** or acts within their narrative.
-*   **Visual Overview:** The Spine provides a clear, high-level overview of the novel's structure, progression of ideas, and thematic distribution, aiding in identifying gaps or areas needing further development.
+*   **Dynamic Storyline & Section Creation:** Once Vertebrae are established, authors can arrange and rearrange them to experiment with different chronological sequences, complex interwoven storylines, and define logical **sections** or acts within their narrative. The manual time stamps provide a reference for the original chronological order, allowing authors to creatively conceal or reveal the cause and effect sequence in the final presentation.
+*   **Visual Overview:** The Spine provides a clear, high-level overview of the novel's structure, progression of ideas, thematic distribution, and underlying chronology, aiding in identifying gaps or areas needing further development and facilitating creative narrative ordering.
 
 #### 4.4. Intuitive Collaborative Writing Environment
 

@@ -32,14 +32,15 @@ This document outlines proposals to address the core problems in collaborative w
 
 **Problem:** Supporting the often non-sequential way authors develop story ideas and narrative arcs.
 
-**Proposal:** Enhance the "Novel Spine" feature to allow authors to capture and organize ideas in a non-linear manner.
+**Proposal:** Enhance the "Novel Spine" feature to allow authors to capture and organize ideas in a non-linear manner while maintaining an underlying chronological framework.
 
 *   **Details:**
     *   Allow authors to create "Vertebrae" representing core ideas, plot points, or thematic elements.
+    *   Enable manual time stamping of Vertebrae to establish an inherent chronological sequence.
     *   Enable tagging and categorization of Vertebrae with relevant themes and topics.
-    *   Provide a visual overview of the Novel Spine, allowing authors to rearrange Vertebrae and experiment with different storylines.
-*   **UX Principles:** Flexibility, Engagement
-*   **Notes for Developers:** Integrate with the existing Novel Spine feature.
+    *   Provide a visual overview of the Novel Spine, allowing authors to rearrange Vertebrae and experiment with different storylines, while the time stamps provide a reference for the original chronological order. This allows authors to creatively conceal or reveal the cause and effect sequence in the final presentation.
+*   **UX Principles:** Flexibility, Engagement, Clarity
+*   **Notes for Developers:** Integrate manual time stamping functionality with the existing Novel Spine feature and ensure the visual overview clearly displays both the arranged order and the underlying chronological order based on time stamps.
 
 ## 4. Structural & Thematic Cohesion
 
