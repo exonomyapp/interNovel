@@ -88,10 +88,10 @@ The Internovel Platform is built on a microservices architecture, leveraging clo
 
 The platform uses a combination of traditional authentication methods and decentralized identity solutions. Key components include:
 
-- **OAuth 2.0**: For traditional authentication and authorization (where applicable, e.g., for external service integration).
-- **Decentralized Identifiers (DIDs)**: For managing user identities, anchored to `did:key` for MVP1.
+- **OAuth 2.0**: Used for traditional authentication and authorization, specifically for connecting to a variety of external third-party services to enable document storage integration and leveraging external resources.
+- **Decentralized Identifiers (DIDs)**: For managing core user identities and ensuring immutable attribution of contributions, anchored to `did:key` for MVP1.
 - **JWT Tokens**: For secure communication between frontend and backend services.
-- **Web Crypto API**: Used for in-browser key generation and cryptographic operations.
+- **Web Crypto API**: Used for in-browser key generation and cryptographic operations for DID management.
 - **IndexedDB**: Used for secure storage of encrypted private keys in the browser.
 - **Challenge-Response Mechanism**: For DID-based authentication.
 
