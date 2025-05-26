@@ -51,7 +51,7 @@ The application now enforces the use of CSS Grid for all major UI components. Fl
 
 ### 2. **Backend API Development**
 - [x] Create endpoints for fetching issues and comments from GitHub
-- [x] Implement GitHub authentication using a personal access token
+- [x] Implement GitHub authentication using a personal access token (Backend implemented)
 - [x] Develop API for updating issue descriptions
 - [x] Implement automatic issue relationship detection in descriptions
 - [x] Develop automatic enhancement of issue references with titles and links
@@ -61,10 +61,28 @@ The application now enforces the use of CSS Grid for all major UI components. Fl
 
 ### 3. **Data Storage and Management**
 - [ ] Implement IndexedDB integration for offline capabilities
-- [ ] Define comprehensive data schema for issues and relationships
-- [ ] Develop synchronization logic between GitHub and local storage
+    - [ ] 1. Define Local Data Schema for issues, comments, and relationships in IndexedDB.
+    - [ ] 2. Create an IndexedDB Service/Wrapper (Nuxt 3 composable) for CRUD operations, transactions, and versioning.
+    - [ ] 3. Implement Data Hydration and Caching Strategy: Store/update data from GitHub API into IndexedDB when online.
+    - [ ] 4. Implement Offline Data Access: Modify UI components to read from IndexedDB when offline.
+    - [ ] 5. Implement Online/Offline Status Detection to switch data sources.
+    - [ ] 6. Implement Basic Offline Read-Only: Disable data modification UI when offline. (Note: Advanced offline support with change queuing and sync is a future task under "Develop synchronization logic...").
+    - [ ] 7. Implement User Interface Considerations for Offline/Stale Data:
+        - Display a clear "Offline Mode" message.
+        - Show the timestamp of the last successful synchronization (e.g., "Data last updated: [Date & Time]").
+        - When online and discrepancies are found (server has newer data):
+            - Notify the user that updates are available.
+            - Offer to update local data (e.g., via "refresh" or "reload" mechanisms) with user consent (no automatic refresh).
+            - (Note: Conflict resolution for local offline changes is out of scope for initial offline implementation).
+    - [ ] 8. Implement Error Handling and Storage Management for IndexedDB:
+        - Handle IndexedDB errors (e.g., storage full, transaction failures).
+        - Integrate with existing "refresh" (component-specific) and "reload" (global event) UI components:
+            - "Refresh": If online, re-fetch from API & update IndexedDB. If offline, re-read from IndexedDB.
+            - "Reload": If online, could trigger a broader sync check. If offline, ensure UI reflects IndexedDB.
+        - Provide a mechanism for users to clear local IndexedDB cache if needed.
+- [ ] Define comprehensive data schema for issues and relationships (This task is now covered by sub-task 1 of "Implement IndexedDB integration...")
+- [ ] Develop advanced synchronization logic between GitHub and local storage (e.g., handling local modifications made offline, conflict resolution, background sync). The existing "refresh" and "reload" functionalities will be enhanced to work with the local cache and trigger appropriate sync actions when online.
 - [ ] Implement local search functionality across issues
-- [ ] Create data caching mechanisms to reduce GitHub API calls
 
 ### 4. **GitHub Integration**
 - [x] Integrate Octokit to interact with GitHub API
@@ -78,12 +96,12 @@ The application now enforces the use of CSS Grid for all major UI components. Fl
 ### 5. **UI Components and Features**
 - [x] Design and implement hierarchical tree view for issue relationships
 - [x] Create detailed issue view with metadata display
-- [x] Develop tabbed markdown editor with preview functionality
+- [ ] Develop tabbed markdown editor with preview functionality (Code evidence not found; likely not yet implemented)
 - [x] Implement child issues listing in parent issue view
 - [x] Develop automation status dashboard for AI task issues
 - [x] Add comment management interface with full CRUD capabilities
 - [x] Implement consistent CSS Grid layout for the application
-- [x] Create user authentication UI in the left sidebar
+- [x] Create user authentication UI in the left sidebar (Mock implementation)
 - [ ] Add drag-and-drop functionality for rearranging issue relationships
 - [ ] Implement bulk editing capabilities for multiple issues
 - [ ] Add filtering and sorting options for the issues list
@@ -105,8 +123,8 @@ The application now enforces the use of CSS Grid for all major UI components. Fl
 - [ ] Add result visualization for completed automation tasks
 
 ### 8. **User Experience Enhancements**
-- [x] Implement markdown preview for issue descriptions
-- [x] Add contextual actions based on issue types
+- [ ] Implement markdown preview for issue descriptions
+- [ ] Add contextual actions based on issue types
 - [ ] Develop keyboard shortcuts for common actions
 - [ ] Implement notifications for issue updates
 - [ ] Create comprehensive help documentation
