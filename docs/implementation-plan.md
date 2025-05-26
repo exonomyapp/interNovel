@@ -227,16 +227,17 @@ This section breaks down the implementation work into individual tasks, formatte
 
 **Description:**
 
-*   **Context:** This task focuses on building the fundamental text editing capabilities within the collaborative writing environment, as described in `vision-scope.md` and the "Intuitive Collaborative Writing Environment" section of `functional-spec.md`.
+*   **Context:** This task focuses on building the fundamental text editing capabilities within the collaborative writing environment, as described in `vision-scope.md` and the "Intuitive Collaborative Writing Environment" section of `functional-spec.md`. This will involve integrating a rich text editor and potentially using Vuetify components for the editor's UI elements.
 *   **Requirements:**
     *   Provide a rich text editing area for writing novel content.
-    *   Include basic formatting options (e.g., bold, italics, headings).
+    *   Include basic formatting options (e.g., bold, italics, headings), potentially using Vuetify components for toolbars and controls.
     *   Allow authors to associate text content with specific Vertebrae or sections from the Novel Spine.
-*   **Technical Approach:** Integrate a rich text editor library (e.g., TipTap, Quill). Develop frontend components to connect the editor with the Novel Spine structure and data models.
+*   **Technical Approach:** Integrate a rich text editor library (e.g., TipTap, Quill). Develop frontend components to connect the editor with the Novel Spine structure and data models. Utilize Vuetify components for the editor's interface elements where appropriate.
 *   **Acceptance Criteria:**
     *   Authors can write and format text within the editor.
     *   Text content can be linked to specific Vertebrae or sections.
-*   **Notes/Considerations:** Consider real-time collaboration requirements when choosing and implementing the editor.
+    *   Editor UI elements (if using Vuetify) are functional and consistent with the overall theme.
+*   **Notes/Considerations:** Consider real-time collaboration requirements when choosing and implementing the editor. Refer to `docs/Vuetifying.md` for guidance on using Vuetify components.
 
 #### **Task Title:** Implement Simplified Real-Time Collaboration and Awareness
 
@@ -413,17 +414,17 @@ This section breaks down the implementation work into individual tasks, formatte
 
 **Description:**
 
-*   **Context:** This task focuses on implementing the core frontend layout and ensuring the application is responsive across various devices, adhering to the UX principles outlined in `vision-scope.md` and `product-plan.md`.
+*   **Context:** This task focuses on implementing the core frontend layout and ensuring the application is responsive across various devices, adhering to the UX principles outlined in `vision-scope.md` and `product-plan.md`. This will be achieved using the Vuetify UI framework.
 *   **Requirements:**
-    *   Implement the main layout structure using Nuxt.js 3 and Vue.js.
-    *   Ensure the design is responsive and adapts well to different screen sizes (desktop, tablet, mobile).
-    *   Prioritize simplicity and intuitiveness in the UI implementation.
-*   **Technical Approach:** Utilize CSS frameworks or preprocessors (e.g., Tailwind CSS, SCSS) and Vue.js components to build the responsive layout. Implement mobile-first or responsive design principles.
+    *   Implement the main layout structure using Nuxt.js 3, Vue.js, and Vuetify components.
+    *   Ensure the design is responsive and adapts well to different screen sizes (desktop, tablet, mobile) using Vuetify's grid system and breakpoints.
+    *   Prioritize simplicity and intuitiveness in the UI implementation, leveraging Vuetify's pre-built components.
+*   **Technical Approach:** Utilize Vuetify's layout components (e.g., `v-app`, `v-main`, `v-container`, `v-row`, `v-col`) and utility classes for building the responsive layout. Implement mobile-first or responsive design principles as guided by Vuetify's documentation.
 *   **Acceptance Criteria:**
     *   The application layout is consistent and functional across different devices.
     *   Key UI elements are easily accessible on various screen sizes.
-    *   The overall look and feel aligns with the desired user experience.
-*   **Notes/Considerations:** Pay close attention to touch interactions on mobile devices.
+    *   The overall look and feel aligns with the desired user experience and utilizes Vuetify components.
+*   **Notes/Considerations:** Refer to `docs/Vuetifying.md` for architecture decisions and implementation checklist. Pay close attention to touch interactions on mobile devices.
 
 #### **Task Title:** Implement Core Navigation and Routing
 

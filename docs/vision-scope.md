@@ -9,7 +9,7 @@
 
 InterNovel is a revolutionary collaborative writing platform designed to empower authors, particularly young creators such as high school students, to co-create narratives, share worlds, and retain clear ownership of their intellectual contributions. Our vision is to foster a dynamic literary ecosystem where creativity flourishes through seamless collaboration, the discovery of characters and novels, and shared storytelling, underpinned by modern, user-centric technology.
 
-For its Minimum Viable Product (MVP1), InterNovel will manifest as an engaging and intuitive website. While architected with future decentralization in mind, MVP1 will prioritize a smooth, performant, and centrally-enhanced user experience to ensure accessibility and ease of use for our target audience.
+For its Minimum Viable Product (MVP1), InterNovel will manifest as an engaging and intuitive website, built with the Vuetify UI framework for a responsive and efficient user interface. While architected with future decentralization in mind, MVP1 will prioritize a smooth, performant, and centrally-enhanced user experience to ensure accessibility and ease of use for our target audience.
 
 ### **2. Core Problem Addressed**
 
@@ -109,12 +109,14 @@ InterNovel will support a tiered authorization system to manage user permissions
 
 ### **5. User Experience (UX) Principles for MVP1**
 
+Leveraging the Vuetify UI framework to implement these principles. Refer to [Vuetifying.md](Vuetifying.md) for detailed architecture decisions regarding Vuetify.
+
 *   **Simplicity & Intuitiveness:** Prioritize ease of use, especially for the target audience of high school students. Abstract technical complexities.
 *   **Engagement:** Create a visually appealing and interactive environment that encourages creativity and collaboration.
 *   **Clarity:** Ensure all features, especially those related to IP, contributions, structure, and themes, are clearly explained and transparent.
 *   **Flexibility:** Support diverse writing styles and non-linear creative processes through features like the Novel Spine and thematic tagging.
-*   **Responsive Design:** Ensure the platform is accessible and provides an optimal viewing and interaction experience across a variety of devices, including desktops, tablets, and smartphones.
-*   **Accessibility:** Adhere to web accessibility standards.
+*   **Responsive Design:** Utilize Vuetify's built-in grid system and utility classes to ensure the platform is accessible and provides an optimal viewing and interaction experience across a variety of devices, including desktops, tablets, and smartphones.
+*   **Accessibility:** Adhere to web accessibility standards, utilizing Vuetify's accessibility features where applicable.
 
 ### **6. Success Metrics for MVP1**
 

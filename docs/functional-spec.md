@@ -42,12 +42,12 @@ This document provides detailed functional specifications for the features outli
 **Proposal:** Build a responsive and intuitive writing environment with real-time collaboration features.
 
 *   **Details:**
-    *   Use Nuxt.js 3 and Pinia for the frontend.
+    *   Use Nuxt.js 3 and Pinia for the frontend, leveraging the Vuetify UI framework for components and styling.
     *   Implement presence indicators, near real-time updates, and activity notifications.
     *   Include core writing tools, simplified version tracking, and tools for managing sections, themes, and topics.
     *   Implement a granular permission system.
 *   **UX Principles:** Simplicity & Intuitiveness, Engagement
-*   **Notes for Developers:** Focus on performance and responsiveness.
+*   **Notes for Developers:** Focus on performance and responsiveness, utilizing Vuetify's features for efficient rendering and layout. Refer to [Vuetifying.md](Vuetifying.md) for detailed architecture decisions regarding Vuetify.
 
 ## 4. Authorization and Moderation
 
@@ -143,11 +143,11 @@ This document provides detailed functional specifications for the features outli
 **Proposal:** Prioritize simplicity and intuitiveness in the design of all features, abstracting technical complexities and providing clear explanations.
 
 *   **Details:**
-    *   Use a visually appealing and interactive environment.
+    *   Use a visually appealing and interactive environment, built with Vuetify components.
     *   Provide clear explanations of all features, especially those related to IP, contributions, structure, and themes.
     *   Offer tutorials and help resources for new users.
 *   **UX Principles:** Simplicity & Intuitiveness, Clarity
-*   **Notes for Developers:** Focus on user-friendly design and clear documentation.
+*   **Notes for Developers:** Focus on user-friendly design and clear documentation, leveraging Vuetify's built-in accessibility features and guidelines.
 
 ## 12. Structural & Thematic Cohesion
 

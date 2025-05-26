@@ -50,7 +50,7 @@ Enables authors to construct a "Novel Spine" of "Vertebrae," representing ideas,
 
 ### Intuitive Collaborative Writing Environment
 
-Built with Nuxt.js 3 and Pinia for a responsive and efficient user interface and state management. Nuxt.js 3 server-side capabilities handle backend logic. MVP1 focuses on simplified real-time collaboration with presence indicators, near real-time updates, activity notifications, and a follow/subscription feature. Core writing tools include text editing, simplified version tracking, and tools for managing sections, themes, and topics integrated with the Novel Spine. A granular permission system allows authors to control access to their works.
+Built with Nuxt.js 3, Pinia for state management, and Vuetify for the UI framework, providing a responsive and efficient user interface. Nuxt.js 3 server-side capabilities handle backend logic. MVP1 focuses on simplified real-time collaboration with presence indicators, near real-time updates, activity notifications, and a follow/subscription feature. Core writing tools include text editing, simplified version tracking, and tools for managing sections, themes, and topics integrated with the Novel Spine. A granular permission system allows authors to control access to their works.
 
 ### The "Casting Studio": Character Discovery & Showcase (Community Feature)
 
@@ -80,7 +80,7 @@ The Internovel Platform is built on a microservices architecture, leveraging clo
 
 ### Component Structure
 
-1. **Frontend & Backend**: Built with Nuxt.js 3 (Vue.js-based), providing a responsive and intuitive user interface and handling server-side logic and API endpoints.
+1. **Frontend & Backend**: Built with Nuxt.js 3 (Vue.js-based), providing a responsive and intuitive user interface and handling server-side logic and API endpoints. The frontend leverages the Vuetify UI framework for componentry and styling. Refer to [Vuetifying.md](Vuetifying.md) for detailed architecture decisions regarding Vuetify.
 2. **Database**: Utilizes Supabase (PostgreSQL) for storing user data, novel metadata, collaboration states, character bios, and feature-specific data.
 3. **Decentralized Identity Layer**: Manages decentralized identity using W3C Decentralized Identifiers (DIDs) and cryptographic operations.
 
