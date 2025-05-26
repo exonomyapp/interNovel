@@ -12,9 +12,9 @@
           class="gh-button"
           :loading="isLoading"
         >
-          <v-icon size="small">mdi-reload</v-icon>
-          <span class="ms-1">Refresh</span>
-        </v-btn>
+        <v-icon size="small">mdi-reload</v-icon>
+        <span class="ms-1">Refresh</span>
+      </v-btn>
       </div>
     </div>
     

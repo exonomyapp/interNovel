@@ -78,19 +78,30 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useTheme } from 'vuetify';
 import { useGithub } from '~/composables/useGithub';
 
 const theme = useTheme();
 const isDark = computed(() => theme.global.current.value.dark);
 
-const { isAuthenticated, userAvatar, userName, loading, logout } = useGithub();
-
-// Theme toggle
+// Theme toggle with persistence
 function toggleTheme() {
-  theme.global.name.value = isDark.value ? 'light' : 'dark';
+  const newTheme = isDark.value ? 'light' : 'dark';
+  theme.global.name.value = newTheme;
+  // Save theme preference to localStorage
+  localStorage.setItem('theme', newTheme);
 }
+
+// Initialize theme from localStorage on mount
+onMounted(() => {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    theme.global.name.value = savedTheme;
+  }
+});
+
+const { isAuthenticated, userAvatar, userName, loading, logout } = useGithub();
 
 const loginWithGitHub = () => {
   window.location.href = 'https://github.com/login/oauth/authorize?client_id=Ov23liMrCpSFajxWzoYp&redirect_uri=http://localhost:3001/auth/callback&scope=repo,user';
@@ -123,6 +134,12 @@ const handleLogout = () => {
   height: 100%;
 }
 
+.gh-title {
+  color: var(--gh-fg-default);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
 .user-avatar {
   display: flex;
   align-items: center;
@@ -151,5 +168,13 @@ const handleLogout = () => {
 
 :deep(.v-divider) {
   border-color: var(--gh-border-muted) !important;
+}
+
+:deep(.v-btn) {
+  color: var(--gh-fg-default) !important;
+}
+
+:deep(.v-btn:hover) {
+  background-color: var(--gh-bg-subtle) !important;
 }
 </style> 

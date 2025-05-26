@@ -19,6 +19,7 @@
     "@mdi/font": "^7.3.67",
     "@octokit/rest": "^20.1.2",
     "dexie": "^3.2.4",
-    "vuetify": "^3.4.3"
+    "vuetify": "^3.4.3",
+    "vuetify-nuxt-module": "^0.18.6"
   }
 }

@@ -9,16 +9,16 @@
             <v-img :src="userAvatar" alt="User Avatar" />
           </v-avatar>
         </div>
-        <v-btn
+      <v-btn
           color="error"
           prepend-icon="mdi-logout"
-          class="user-btn"
+        class="user-btn"
           @click="logout"
           variant="tonal"
-          block
-        >
+        block
+      >
           Logout
-        </v-btn>
+      </v-btn>
       </div>
 
       <v-btn 

@@ -1,43 +1,43 @@
 <template>
   <div class="page-container">
-    <div class="page-grid">
+  <div class="page-grid">
       <!-- Left column -->
       <div class="left-column">
         <div class="panel panel-repos">
           <repository-list v-model:selected="selectedRepository" />
         </div>
-        <div class="panel panel-tree">
+    <div class="panel panel-tree">
           <tree-nav 
             ref="treeNavComponent" 
             @issue-selected="handleIssueSelected"
             :repository="selectedRepository?.full_name"
           />
         </div>
-      </div>
+    </div>
 
       <!-- Right column -->
       <div class="right-column">
-        <div class="panel panel-details">
+    <div class="panel panel-details">
           <v-card v-if="selectedIssue" class="gh-box h-100">
-            <IssueDetail :issue="selectedIssue" />
-          </v-card>
+        <IssueDetail :issue="selectedIssue" />
+      </v-card>
           <v-card v-else class="gh-box h-100 d-flex align-center justify-center">
             <span class="gh-subtitle">Select an issue to view details</span>
-          </v-card>
-        </div>
+      </v-card>
+    </div>
 
-        <div class="panel panel-comments">
+    <div class="panel panel-comments">
           <v-card v-if="selectedIssue" class="gh-box h-100">
-            <comments-section :issue="selectedIssue" />
-          </v-card>
+        <comments-section :issue="selectedIssue" />
+      </v-card>
           <v-card v-else class="gh-box h-100 d-flex align-center justify-center">
             <span class="gh-subtitle">Select an issue to view comments</span>
-          </v-card>
-        </div>
+      </v-card>
+    </div>
 
-        <div class="panel panel-logs">
+    <div class="panel panel-logs">
           <v-card class="gh-box h-100">
-            <log-viewer />
+      <log-viewer />
           </v-card>
         </div>
       </div>

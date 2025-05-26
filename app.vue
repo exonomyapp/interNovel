@@ -59,4 +59,13 @@ html, body {
 .v-main {
   padding-top: 0 !important;
 }
+
+.v-application {
+  background-color: var(--gh-bg-default) !important;
+  color: var(--gh-fg-default) !important;
+}
+
+.v-main {
+  background-color: var(--gh-bg-default) !important;
+}
 </style>

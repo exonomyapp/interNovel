@@ -2,7 +2,7 @@
 import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
-  runtimeConfig: {
+   runtimeConfig: {
     public: {
       githubClientId: 'Ov23liMrCpSFajxWzoYp',
       baseUrl: 'http://localhost:3000'

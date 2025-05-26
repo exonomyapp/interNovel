@@ -43,8 +43,8 @@ const route = useRoute();
 const { initialize } = useGithub();
 
 const handleAuth = async () => {
-  const code = route.query.code;
-  
+const code = route.query.code;
+
   if (!code) {
     error.value = 'No authorization code found in the URL. Please try signing in again.';
     loading.value = false;
