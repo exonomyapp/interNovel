@@ -30,6 +30,7 @@ Details for each object store:
     *   `creator_id`: STRING - Identifier of the user who created the issue.
     *   `assignee_id`: STRING (nullable) - Identifier of the user assigned to the issue.
     *   `labels`: ARRAY_OF_STRINGS - A list of labels associated with the issue (e.g., `["bug", "feature"]`).
+    *   `parent_issue_id`: STRING (nullable) - Identifier of the parent issue, if this is a sub-task/child issue. References `issues.id`.
 *   **Indexes:**
     *   `number_idx`: on `number` (unique: true)
     *   `status_idx`: on `status`
@@ -38,6 +39,7 @@ Details for each object store:
     *   `updated_at_idx`: on `updated_at`
     *   `assignee_id_idx`: on `assignee_id`
     *   `labels_idx`: on `labels` (multiEntry: true)
+    *   `parent_issue_id_idx`: on `parent_issue_id` (to find child issues)
 
 ### 3.2. `comments`
 
@@ -70,6 +72,10 @@ Details for each object store:
 
 *   **Issue to Comments (One-to-Many):** An issue can have multiple comments. This is modeled by storing `issue_id` in each comment object.
 *   **User Involvement (Creator/Assignee):** `creator_id` and `assignee_id` fields link issues and comments to users. If the `users` object store is implemented, these IDs would reference `users.id`.
+*   **Parent-Child Relationships Between Issues (Hierarchical):**
+    *   An issue can be a child of another issue. This is modeled by the `parent_issue_id` field in the `issues` object store, which references the `id` of the parent issue.
+    *   The application logic is responsible for parsing issue descriptions (or other designated fields/inputs) to identify these relationships and populate the `parent_issue_id` accordingly. This schema defines how such an identified relationship is stored locally.
+    *   Retrieving all children of a parent issue can be done by querying the `issues` store where `parent_issue_id` matches the parent's `id`.
 
 ## 5. Data Synchronization Strategy (Future Consideration)
 
