@@ -52,8 +52,9 @@
             <!-- User controls at top -->
             <section class="sidebar-section">
               <Users 
-                :isAuthenticated="isAuthenticated" 
+                :is-authenticated="isAuthenticated" 
                 @login="loginWithGitHub" 
+                @logout="logout"
                 @settings="showSettings" 
               />
             </section>
@@ -85,20 +86,22 @@ import Users from '../components/Users.vue';
 // Event bus
 const { emit } = useEventBus();
 
-// GitHub auth state (mock for now, would connect to real auth system)
+// GitHub auth state
 const isAuthenticated = ref(false);
-const userName = ref('GitHub User');
-const userAvatar = ref('https://avatars.githubusercontent.com/u/583231?v=4'); // Default GitHub octocat
+const userName = ref('');
+const userAvatar = ref('');
 
 // Auth methods
 const loginWithGitHub = () => {
-  // Mock GitHub authentication - would be replaced with actual OAuth flow
-  isAuthenticated.value = true;
-  userName.value = 'Demo User';
+  // Just emit the login event, actual login is handled by Users component
+  console.log('Login initiated from layout');
 };
 
 const logout = () => {
   isAuthenticated.value = false;
+  userName.value = '';
+  userAvatar.value = '';
+  localStorage.removeItem('github_access_token');
 };
 
 const viewProfile = () => {
@@ -108,23 +111,41 @@ const viewProfile = () => {
 
 // Actions
 const createNewIssue = () => {
-  // This will trigger any listening components to show the create form
   emit(EVENTS.SHOW_CREATE_FORM);
 };
 
 const reloadData = () => {
-  // This will trigger a reload of the main data
   emit(EVENTS.RELOAD_DATA);
 };
 
 const showSettings = () => {
-  // This would open a settings dialog
   console.log('Settings clicked');
 };
 
 // Initialize on mount
-onMounted(() => {
-  // Any initialization logic needed
+onMounted(async () => {
+  const token = localStorage.getItem('github_access_token');
+  if (token) {
+    try {
+      const response = await fetch('https://api.github.com/user', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        isAuthenticated.value = true;
+        userName.value = data.login;
+        userAvatar.value = data.avatar_url;
+      } else {
+        // If token is invalid, remove it
+        localStorage.removeItem('github_access_token');
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      localStorage.removeItem('github_access_token');
+    }
+  }
 });
 </script>
 
@@ -133,6 +154,31 @@ onMounted(() => {
   height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.x-header {
+  background: rgb(var(--v-theme-surface));
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+  padding: 8px 16px;
+}
+
+.x-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.x-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: rgb(var(--v-theme-on-surface));
+  margin: 0;
 }
 
 .x-main-layout {
@@ -167,5 +213,39 @@ onMounted(() => {
 
 .sidebar-section:last-child {
   margin-bottom: 0;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+}
+
+.user-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.user-trigger:hover {
+  background-color: rgba(var(--v-theme-on-surface), 0.04);
+}
+
+.username {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+.x-menu-card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.x-menu-item {
+  min-height: 40px;
 }
 </style>

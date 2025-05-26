@@ -1,111 +1,145 @@
 <template>
-  <div class="page-grid">
-    <!-- Panel 1: Issues List (Tree) -->
-    <div class="panel panel-tree">
-      <tree-nav ref="treeNavComponent" @issue-selected="handleIssueSelected" />
-    </div>
-    
-    <!-- Panel 2: Issue Details -->
-    <div class="panel panel-details">
-      <v-card v-if="selectedIssue" class="h-100">
-        <IssueDetail :issue="selectedIssue" />
-      </v-card>
-      <v-card v-else class="h-100 d-flex align-center justify-center">
-        <span class="text-medium-emphasis">Select an issue to view details</span>
-      </v-card>
-    </div>
+  <div class="page-container">
+    <div class="page-grid">
+      <!-- Left column -->
+      <div class="left-column">
+        <div class="panel panel-repos">
+          <repository-list v-model:selected="selectedRepository" />
+        </div>
+        <div class="panel panel-tree">
+          <tree-nav 
+            ref="treeNavComponent" 
+            @issue-selected="handleIssueSelected"
+            :repository="selectedRepository?.full_name"
+          />
+        </div>
+      </div>
 
-    <!-- Panel 3: Comments Section -->
-    <div class="panel panel-comments">
-      <v-card v-if="selectedIssue" class="h-100">
-        <comments-section :issue="selectedIssue" />
-      </v-card>
-      <v-card v-else class="h-100 d-flex align-center justify-center">
-        <span class="text-medium-emphasis">Select an issue to view comments</span>
-      </v-card>
-    </div>
+      <!-- Right column -->
+      <div class="right-column">
+        <div class="panel panel-details">
+          <v-card v-if="selectedIssue" class="gh-box h-100">
+            <IssueDetail :issue="selectedIssue" />
+          </v-card>
+          <v-card v-else class="gh-box h-100 d-flex align-center justify-center">
+            <span class="gh-subtitle">Select an issue to view details</span>
+          </v-card>
+        </div>
 
-    <!-- Panel 4: Logs -->
-    <div class="panel panel-logs">
-      <log-viewer />
+        <div class="panel panel-comments">
+          <v-card v-if="selectedIssue" class="gh-box h-100">
+            <comments-section :issue="selectedIssue" />
+          </v-card>
+          <v-card v-else class="gh-box h-100 d-flex align-center justify-center">
+            <span class="gh-subtitle">Select an issue to view comments</span>
+          </v-card>
+        </div>
+
+        <div class="panel panel-logs">
+          <v-card class="gh-box h-100">
+            <log-viewer />
+          </v-card>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { useEventBus, EVENTS } from '../composables/useEventBus';
 import TreeNav from '../components/TreeNav.vue';
 import IssueDetail from '../components/IssueDetail.vue';
 import CommentsSection from '../components/CommentsSection.vue';
 import LogViewer from '../components/LogViewer.vue';
+import RepositoryList from '../components/RepositoryList.vue';
 import type { Issue, Comment } from '../types';
 import { useTheme } from 'vuetify';
 
-// Fix component ref typing
+// Refs and state
 const treeNavComponent = ref<InstanceType<typeof TreeNav> | null>(null);
 const theme = useTheme();
-
-// UI state
 const showCreateForm = ref(false);
-const showComments = ref(false);
-
-// Data state
 const selectedIssue = ref<Issue | null>(null);
-const currentIssueId = ref<number | null>(null);
 const comments = ref<Comment[]>([]);
 const isLoadingComments = ref(false);
 const newComment = ref('');
 const isSubmittingComment = ref(false);
+const isFetchingComments = ref(false);
+const selectedRepository = ref<{ id: number; name: string; full_name: string } | null>(null);
+const githubAccessToken = ref<string | null>(null);
 
-// Mock current user (would come from auth)
-const currentUser = 'Demo User';
+// Computed property for authentication state
+const isAuthenticated = computed(() => !!githubAccessToken.value);
 
-// Event bus
+// Watch for repository changes
+watch(selectedRepository, () => {
+  // Clear selected issue when repository changes
+  selectedIssue.value = null;
+  comments.value = [];
+  // Reload the tree nav
+  if (treeNavComponent.value?.reload) {
+    treeNavComponent.value.reload();
+  }
+});
+
+// Handle logout
+const handleLogout = () => {
+  githubAccessToken.value = null;
+  localStorage.removeItem('github_access_token');
+  selectedRepository.value = null;
+  selectedIssue.value = null;
+  comments.value = [];
+};
+
+// Handle login
+const handleLogin = () => {
+  // The actual login will be handled by the Users component
+  console.log('Login initiated');
+};
+
+// Simulate auth token parsing after OAuth redirect
+onMounted(() => {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (token) {
+    githubAccessToken.value = token;
+    localStorage.setItem('github_access_token', token);
+  } else {
+    const storedToken = localStorage.getItem('github_access_token');
+    githubAccessToken.value = storedToken;
+  }
+});
+
+// EventBus setup
 const { on, emit } = useEventBus();
 let unsubscribes: Function[] = [];
 
-// Toggle create form
-const toggleCreateForm = () => {
-  showCreateForm.value = !showCreateForm.value;
-};
-
-// Handlers
 const handleIssueSelected = (issue: Issue | null) => {
-  console.log('Index: Handling issue selection:', issue);
-  if (!issue) {
-    selectedIssue.value = null;
-    return;
-  }
-
   selectedIssue.value = issue;
-  if (issue.number) {
+  if (issue?.number && selectedRepository.value) {
     void fetchComments(issue.number);
   }
 };
 
-// Add flag to prevent duplicate fetches
-const isFetchingComments = ref(false);
-
-// API calls
 const fetchComments = async (issueNumber: number) => {
-  // Prevent concurrent fetches
-  if (isFetchingComments.value) return;
-
+  if (isFetchingComments.value || !githubAccessToken.value || !selectedRepository.value) return;
   isFetchingComments.value = true;
   isLoadingComments.value = true;
   comments.value = [];
-  
+
   try {
-    const response = await fetch(`/api?type=comments&issueNumber=${issueNumber}`);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch comments: ${response.status}`);
-    }
-    
+    const response = await fetch(`https://api.github.com/repos/${selectedRepository.value.full_name}/issues/${issueNumber}/comments`, {
+      headers: {
+        Authorization: `Bearer ${githubAccessToken.value}`,
+      },
+    });
+
+    if (!response.ok) throw new Error(`Error ${response.status}`);
+
     comments.value = await response.json();
   } catch (error) {
-    console.error('Error fetching comments:', error);
+    console.error('Failed to fetch comments:', error);
   } finally {
     isLoadingComments.value = false;
     isFetchingComments.value = false;
@@ -113,130 +147,115 @@ const fetchComments = async (issueNumber: number) => {
 };
 
 const submitComment = async () => {
-  if (!selectedIssue.value || !newComment.value.trim()) return;
-  
+  if (!selectedIssue.value || !newComment.value.trim() || !githubAccessToken.value || !selectedRepository.value) return;
   isSubmittingComment.value = true;
-  
+
   try {
-    const response = await fetch('/api?type=comments', {
+    const response = await fetch(`https://api.github.com/repos/${selectedRepository.value.full_name}/issues/${selectedIssue.value.number}/comments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${githubAccessToken.value}`,
       },
       body: JSON.stringify({
-        issueNumber: selectedIssue.value.number,
         body: newComment.value,
       }),
     });
-    
-    if (!response.ok) {
-      throw new Error(`Failed to add comment: ${response.status}`);
-    }
-    
+
+    if (!response.ok) throw new Error(`Error ${response.status}`);
+
     const comment = await response.json();
     comments.value.push(comment);
     newComment.value = '';
     emit(EVENTS.COMMENT_ADDED, comment);
   } catch (error) {
-    console.error('Error adding comment:', error);
+    console.error('Failed to post comment:', error);
   } finally {
     isSubmittingComment.value = false;
   }
 };
 
-// Toggle dark mode
+// Dark mode toggle
 const toggleDarkMode = () => {
   theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark';
 };
 
-// Helper functions
-const formatDate = (dateString: string) => {
-  if (!dateString) return '';
-  
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  }).format(date);
-};
-
-const getAvatarUrl = (username: string) => {
-  // In a real app, you'd use the GitHub avatar or fetch it
-  // This is a placeholder that generates a consistent avatar for a username
-  return `https://avatars.dicebear.com/api/identicon/${username || 'unknown'}.svg`;
-};
-
-const getLabelColor = (label: string) => {
-  // Assign consistent colors to common labels
-  const labelColors: Record<string, string> = {
-    bug: 'error',
-    enhancement: 'primary',
-    'good first issue': 'success',
-    documentation: 'info',
-    question: 'warning',
-    automation: 'purple',
-    'ai-task': 'purple',
-  };
-  
-  return labelColors[label.toLowerCase()] || 'default';
-};
-
-// Event subscriptions
+// Event lifecycle
 onMounted(() => {
   unsubscribes = [
     on(EVENTS.SHOW_CREATE_FORM, () => {
       showCreateForm.value = true;
     }),
     on(EVENTS.RELOAD_DATA, () => {
-      if (treeNavComponent.value?.reload) {
-        treeNavComponent.value.reload();
-      }
-    })
+      if (treeNavComponent.value?.reload) treeNavComponent.value.reload();
+    }),
   ];
 });
 
-// Clean up event listeners
 onUnmounted(() => {
-  unsubscribes.forEach(unsubscribe => unsubscribe());
-  unsubscribes = [];
+  unsubscribes.forEach(unsub => unsub());
 });
 
-// Page meta
 useHead({
   title: 'Issue Manager - interNovel',
 });
 </script>
 
 <style scoped>
+.page-container {
+  background-color: var(--gh-bg-canvas);
+  min-height: 100vh;
+}
+
 .page-grid {
   display: grid;
-  grid-template-rows: 3fr 3fr 4fr 2fr;
+  grid-template-columns: minmax(300px, 25%) 1fr;
   gap: 16px;
   padding: 16px;
-  height: calc(100vh - 64px); /* Account for header */
+  height: calc(100vh - 64px);
+  overflow: hidden;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.left-column {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 16px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.right-column {
+  display: grid;
+  grid-template-rows: minmax(200px, 35%) minmax(200px, 35%) minmax(150px, 30%);
+  gap: 16px;
+  height: 100%;
+  overflow: hidden;
 }
 
 .panel {
-  overflow-y: auto;
-  min-height: 0; /* Important for scroll behavior */
-  background: rgb(var(--v-theme-surface));
-  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
+.panel-repos,
 .panel-tree {
-  min-height: 200px;
+  min-height: 0;
+  height: 100%;
 }
 
-.panel-details {
-  min-height: 200px;
-}
-
-.panel-comments {
-  min-height: 200px;
-}
-
+.panel-details,
+.panel-comments,
 .panel-logs {
-  min-height: 150px;
+  min-height: 0;
+  height: 100%;
+}
+
+:deep(.v-card) {
+  background-color: var(--gh-bg-default) !important;
+  border: 1px solid var(--gh-border-default) !important;
+  box-shadow: var(--gh-shadow-small) !important;
 }
 </style>
