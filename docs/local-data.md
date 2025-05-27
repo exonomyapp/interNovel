@@ -30,7 +30,7 @@ Details for each object store:
     *   `creator_id`: STRING - Identifier of the user who created the issue.
     *   `assignee_id`: STRING (nullable) - Identifier of the user assigned to the issue.
     *   `labels`: ARRAY_OF_STRINGS - A list of labels associated with the issue (e.g., `["bug", "feature"]`).
-    *   `parent_issue_id`: STRING (nullable) - Identifier of the parent issue, if this is a sub-task/child issue. References `issues.id`.
+    *   `parent_issue_id`: INTEGER (nullable) - The `number` of the parent issue, if this is a sub-task/child issue. References `issues.number`.
 *   **Indexes:**
     *   `number_idx`: on `number` (unique: true)
     *   `status_idx`: on `status`
@@ -73,9 +73,17 @@ Details for each object store:
 *   **Issue to Comments (One-to-Many):** An issue can have multiple comments. This is modeled by storing `issue_id` in each comment object.
 *   **User Involvement (Creator/Assignee):** `creator_id` and `assignee_id` fields link issues and comments to users. If the `users` object store is implemented, these IDs would reference `users.id`.
 *   **Parent-Child Relationships Between Issues (Hierarchical):**
-    *   An issue can be a child of another issue. This is modeled by the `parent_issue_id` field in the `issues` object store, which references the `id` of the parent issue.
-    *   The application logic is responsible for parsing issue descriptions (or other designated fields/inputs) to identify these relationships and populate the `parent_issue_id` accordingly. This schema defines how such an identified relationship is stored locally.
-    *   Retrieving all children of a parent issue can be done by querying the `issues` store where `parent_issue_id` matches the parent's `id`.
+    *   An issue can be a child of another issue. This relationship is stored by setting the `parent_issue_id` field on the *child issue* to the `number` of the *parent issue*.
+    *   **Establishing Relationships:** These relationships are primarily established by server-side logic (found in `server/api/index.ts` within the `processChildReferences` function) when an issue's description is processed during creation or update. The server parses the description for:
+        1.  **Inline Child References:** The system scans the issue body for various inline formats that reference child issue numbers. The specific regular expressions for these formats are implemented in the backend.
+        2.  **"### Children:" Markdown Section:** A dedicated markdown section starting with the heading `### Children:` can be used. Issue numbers listed under this heading will be identified as children of the current issue. Supported list formats for child issue numbers (e.g., `#123`) include:
+            *   Bulleted items: `- #123` or `* #123`
+            *   Numbered items: `1. #456`
+            *   Task list items: `[ ] #789` or `[x] #789`
+    *   When child issues are identified through these parsing methods, the server updates each identified *child issue* by setting its `parent_issue_id` field to the `number` of the issue whose description contained these references.
+    *   **Direct Assignment:** It's also possible to set the `parent_issue_id` directly in the request body when creating or updating an issue, which bypasses the description parsing logic if the parent is already known.
+    *   **Local Storage:** The `parent_issue_id` field in the local `issues` object store stores the `number` (INTEGER) of the parent issue.
+    *   Retrieving all direct children of a parent issue can be done by querying the local `issues` store where `parent_issue_id` matches the parent's `number`.
 
 ## 5. Data Synchronization Strategy (Future Consideration)
 

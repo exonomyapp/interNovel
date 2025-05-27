@@ -194,19 +194,27 @@ The application integrates with GitHub's user system to provide a personalized e
 
 ### Parent-Child Relationship Management
 
-The system manages relationships between issues through:
+The system manages parent-child relationships between issues primarily through server-side logic located in `server/api/index.ts` (specifically the `processChildReferences` function). This logic is triggered when an issue is created or its description is updated.
 
-1. **Detection**: When an issue contains a task list item like `- [ ] #3`, it establishes a parent-child relationship.
+1.  **Detection & Establishment from Issue Descriptions**:
+    The server parses the parent issue's description to identify child issues in two main ways:
+    *   **Inline Child References**: The system scans the issue body for various inline formats that reference child issue numbers (e.g., `Relates to #123`, `Child: #456`). The specific regular expressions for these formats are implemented in the backend.
+    *   **"### Children:" Markdown Section**: A dedicated markdown section in the parent issue's description, starting with the heading `### Children:`, is parsed. Issue numbers listed under this heading are identified as children. Supported list formats for child issue numbers (e.g., `#123`) include:
+        *   Bulleted items: `- #123` or `* #123`
+        *   Numbered items: `1. #456`
+        *   Task list items: `[ ] #789` or `[x] #789` (Note: while `issueman.md` previously mentioned only `"- [ ] #X"`, the backend supports a broader range of list formats under this section).
 
-2. **Storage**: Relationships are recorded in two ways:
-   - Child issues contain a "### Parent:" section referencing their parent
-   - Parent issues contain a "### Children:" section with task list items for each child
+2.  **Storage**:
+    *   When child issues are identified through the parsing methods above, the server updates each identified *child issue* by setting its `parentId` field to the `number` of the parent issue. This `parentId` is then stored locally in IndexedDB as described in `local-data.md`.
+    *   **Direct Assignment**: It is also possible to set the `parentId` directly in the request body when creating or updating an issue, which bypasses the description parsing logic if the parent is already known.
+    *   The parent issue's description, containing the "### Children:" section or inline references, is stored as-is. The application does *not* automatically add a "### Parent:" section to the child issue's description; the linkage is primarily through the `parentId` field on the child.
 
-3. **Visualization**: The TreeNav component constructs a hierarchical view by:
-   - Building a map of all issues by ID
-   - Establishing relationships based on parentId properties
-   - Performing fallback detection by analyzing issue bodies for task list references
-   - Rendering the resulting tree structure with collapsible branches
+3.  **Visualization**:
+    The `TreeNav` component and other UI elements construct a hierarchical view by:
+    *   Building a map of all issues.
+    *   Primarily relying on the `parentId` property of issues to establish relationships.
+    *   The UI may also visually interpret the "### Children:" section in a parent's description for display purposes or as a secondary cue.
+    *   Rendering the resulting tree structure with collapsible branches.
 
 ### Markdown Editing
 
