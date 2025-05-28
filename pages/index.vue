@@ -1,43 +1,67 @@
 <template>
   <div class="page-container">
-  <div class="page-grid">
+    <div class="page-grid">
       <!-- Left column -->
       <div class="left-column">
         <div class="panel panel-repos">
-          <repository-list v-model:selected="selectedRepository" />
+          <v-select
+            v-model="selectedRepository"
+            :items="repositories"
+            item-title="name"
+            return-object
+            label="Select Repository"
+            class="gh-select"
+            density="compact"
+            variant="outlined"
+            hide-details
+          >
+            <template v-slot:prepend>
+              <v-icon icon="mdi-source-repository" size="small" class="mr-2" color="var(--gh-fg-muted)" />
+            </template>
+            <template v-slot:append>
+              <v-btn
+                icon="mdi-refresh"
+                size="small"
+                variant="text"
+                @click="refreshRepositories"
+                :loading="loading"
+                class="gh-button"
+              ></v-btn>
+            </template>
+          </v-select>
         </div>
-    <div class="panel panel-tree">
+        <div class="panel panel-tree">
           <tree-nav 
             ref="treeNavComponent" 
             @issue-selected="handleIssueSelected"
             :repository="selectedRepository?.full_name"
           />
         </div>
-    </div>
+      </div>
 
       <!-- Right column -->
       <div class="right-column">
-    <div class="panel panel-details">
+        <div class="panel panel-details">
           <v-card v-if="selectedIssue" class="gh-box h-100">
-        <IssueDetail :issue="selectedIssue" />
-      </v-card>
+            <IssueDetail :issue="selectedIssue" />
+          </v-card>
           <v-card v-else class="gh-box h-100 d-flex align-center justify-center">
             <span class="gh-subtitle">Select an issue to view details</span>
-      </v-card>
-    </div>
+          </v-card>
+        </div>
 
-    <div class="panel panel-comments">
+        <div class="panel panel-comments">
           <v-card v-if="selectedIssue" class="gh-box h-100">
-        <comments-section :issue="selectedIssue" />
-      </v-card>
+            <comments-section :issue="selectedIssue" />
+          </v-card>
           <v-card v-else class="gh-box h-100 d-flex align-center justify-center">
             <span class="gh-subtitle">Select an issue to view comments</span>
-      </v-card>
-    </div>
+          </v-card>
+        </div>
 
-    <div class="panel panel-logs">
+        <div class="panel panel-logs">
           <v-card class="gh-box h-100">
-      <log-viewer />
+            <log-viewer />
           </v-card>
         </div>
       </div>
@@ -56,6 +80,15 @@ import RepositoryList from '../components/RepositoryList.vue';
 import type { Issue, Comment } from '../types';
 import { useTheme } from 'vuetify';
 
+// Define repository type
+interface Repository {
+  id: number;
+  name: string;
+  full_name: string;
+  private: boolean;
+  open_issues_count: number;
+}
+
 // Refs and state
 const treeNavComponent = ref<InstanceType<typeof TreeNav> | null>(null);
 const theme = useTheme();
@@ -66,8 +99,10 @@ const isLoadingComments = ref(false);
 const newComment = ref('');
 const isSubmittingComment = ref(false);
 const isFetchingComments = ref(false);
-const selectedRepository = ref<{ id: number; name: string; full_name: string } | null>(null);
 const githubAccessToken = ref<string | null>(null);
+const repositories = ref<Repository[]>([]);
+const selectedRepository = ref<Repository | null>(null);
+const loading = ref(false);
 
 // Computed property for authentication state
 const isAuthenticated = computed(() => !!githubAccessToken.value);
@@ -109,6 +144,7 @@ onMounted(() => {
     const storedToken = localStorage.getItem('github_access_token');
     githubAccessToken.value = storedToken;
   }
+  refreshRepositories();
 });
 
 // EventBus setup
@@ -199,6 +235,40 @@ onUnmounted(() => {
 useHead({
   title: 'Issue Manager - interNovel',
 });
+
+// Add refreshRepositories function
+const refreshRepositories = async () => {
+  loading.value = true;
+  try {
+    const token = localStorage.getItem('github_access_token');
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+
+    const response = await fetch('https://api.github.com/user/repos?sort=updated&per_page=100', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch repositories');
+    }
+
+    const data = await response.json();
+    repositories.value = data.map((repo: any) => ({
+      id: repo.id,
+      name: repo.name,
+      full_name: repo.full_name,
+      private: repo.private,
+      open_issues_count: repo.open_issues_count
+    }));
+  } catch (err) {
+    console.error('Error fetching repositories:', err);
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <style scoped>
@@ -220,7 +290,7 @@ useHead({
 
 .left-column {
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: auto 1fr;
   gap: 16px;
   height: 100%;
   overflow: hidden;
@@ -240,7 +310,11 @@ useHead({
   overflow: hidden;
 }
 
-.panel-repos,
+.panel-repos {
+  min-height: 0;
+  padding: 8px;
+}
+
 .panel-tree {
   min-height: 0;
   height: 100%;
@@ -257,5 +331,22 @@ useHead({
   background-color: var(--gh-bg-default) !important;
   border: 1px solid var(--gh-border-default) !important;
   box-shadow: var(--gh-shadow-small) !important;
+}
+
+:deep(.gh-select) {
+  background-color: var(--gh-bg-default) !important;
+}
+
+:deep(.v-field) {
+  background-color: var(--gh-bg-default) !important;
+  border-color: var(--gh-border-default) !important;
+}
+
+:deep(.v-field:hover) {
+  border-color: var(--gh-border-muted) !important;
+}
+
+:deep(.v-field--focused) {
+  border-color: var(--gh-accent-emphasis) !important;
 }
 </style>

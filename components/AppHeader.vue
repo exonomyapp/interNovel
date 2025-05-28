@@ -80,7 +80,6 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
 import { useTheme } from 'vuetify';
-import { useGithub } from '~/composables/useGithub';
 
 const theme = useTheme();
 const isDark = computed(() => theme.global.current.value.dark);
@@ -104,9 +103,28 @@ onMounted(() => {
 const { isAuthenticated, userAvatar, userName, loading, logout } = useGithub();
 
 const loginWithGitHub = () => {
-  window.location.href = 'https://github.com/login/oauth/authorize?client_id=Ov23liMrCpSFajxWzoYp&redirect_uri=http://localhost:3001/auth/callback&scope=repo,user';
-};
+  // Generate a cryptographically secure random state
+  const state = window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36);
+  localStorage.setItem('github_oauth_state', state);
 
+  // Construct URL with URLSearchParams for proper encoding
+  const authUrl = new URL('https://github.com/login/oauth/authorize');
+  const params = new URLSearchParams({
+    client_id: 'Ov23liMrCpSFajxWzoYp',
+    redirect_uri: 'http://localhost:3001/auth/callback',
+    scope: 'repo user',
+    state: state,
+    prompt: 'login',          // Force credential entry
+    auth_type: 'rerequest',   // Require fresh auth just for your app
+    allow_signup: 'false'     // Hide signup option
+  });
+
+  // Remove the login=username parameter (use only if you want to pre-fill)
+  // params.set('login', 'specific_username_here'); 
+
+  authUrl.search = params.toString();
+  window.location.href = authUrl.href;
+};
 const handleLogout = () => {
   logout();
   // Optionally redirect to home or refresh the page

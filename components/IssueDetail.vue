@@ -25,14 +25,10 @@
         </v-chip>
       </div>
 
-      <v-expansion-panels v-if="issue?.body">
-        <v-expansion-panel>
-          <v-expansion-panel-title>Description</v-expansion-panel-title>
-          <v-expansion-panel-text>
-            {{ issue.body || 'No description provided.' }}
-          </v-expansion-panel-text>
-        </v-expansion-panel>
-      </v-expansion-panels>
+      <div v-if="issue?.body" class="issue-description">
+        <div class="text-subtitle-2 mb-2">Description</div>
+        <div class="issue-body-content" v-html="renderedDescription"></div>
+      </div>
 
       <template v-if="isAutomationIssue">
         <v-divider class="my-4"></v-divider>
@@ -63,6 +59,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useEventBus, EVENTS } from '../composables/useEventBus';
+import { marked } from 'marked';
 
 // Define props
 const props = defineProps<{
@@ -148,13 +145,66 @@ const automationStatus = computed(() => {
 const automationProgress = computed(() => {
   return props.issue?.automationProgress || 0;
 });
+
+const renderedDescription = computed(() => {
+  return props.issue?.body ? marked.parse(props.issue.body) : '<em>No description provided.</em>';
+});
 </script>
 
 <style scoped>
 .issue-detail {
   height: 100%;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.v-card-text {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Add this to your scoped styles */
+.issue-description {
+  margin-top: 16px;
+  flex: 1; /* Take remaining space */
+  min-height: 0; /* Critical for flex children to respect overflow */
+  display: flex;
+  flex-direction: column;
+}
+
+.issue-body-content {
+  flex: 1; /* Fill available space */
+  overflow-y: auto; /* Enable vertical scroll */
+  white-space: pre-wrap;
+  word-wrap: break-word;
   padding: 16px;
+  border-radius: 6px;
+  background-color: var(--gh-bg-subtle);
+  max-height: 300px; /* Set a max height (adjust as needed) */
+  /* Optional: Custom scrollbar (WebKit) */
+  scrollbar-width: thin; /* Firefox */
+}
+
+.issue-body-content pre {
+  background: #222;
+  color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.issue-body-content code {
+  background: #333;
+  color: #fff;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.issue-body-content ul, .issue-body-content ol {
+  margin-left: 1.5em;
 }
 
 .no-selection {
@@ -163,16 +213,6 @@ const automationProgress = computed(() => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: rgba(0, 0, 0, 0.38);
-}
-
-.issue-body-content {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  font-family: inherit;
-  background-color: rgba(0, 0, 0, 0.03);
-  padding: 12px;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  color: var(--gh-fg-muted);
 }
 </style>

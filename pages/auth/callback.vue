@@ -43,9 +43,30 @@ const route = useRoute();
 const { initialize } = useGithub();
 
 const handleAuth = async () => {
-const code = route.query.code;
+  const code = route.query.code;
+  const state = route.query.state;
+  const savedState = localStorage.getItem('github_oauth_state');
+  
+  console.log('Callback received:', {
+    code,
+    state,
+    savedState,
+    query: route.query
+  });
+  
+  // Verify state parameter
+  if (!state || !savedState || state !== savedState) {
+    console.error('State mismatch:', { state, savedState });
+    error.value = 'Invalid state parameter. Please try signing in again.';
+    loading.value = false;
+    return;
+  }
+  
+  // Clear the state from localStorage
+  localStorage.removeItem('github_oauth_state');
 
   if (!code) {
+    console.error('No code received');
     error.value = 'No authorization code found in the URL. Please try signing in again.';
     loading.value = false;
     return;
@@ -73,6 +94,7 @@ const code = route.query.code;
     }
 
     const data = await response.json();
+    console.log('Token exchange successful:', { hasToken: !!data.access_token });
     
     if (data.access_token) {
       console.log('Token received successfully');
