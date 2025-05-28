@@ -24,6 +24,7 @@
             hide-details
             class="mb-2"
             :disabled="isSubmitting"
+            placeholder="You can use markdown formatting in your comment"
           ></v-textarea>
           
           <div class="d-flex justify-end gap-2 mb-4">
@@ -71,7 +72,9 @@
             <v-card-title>{{ comment.author }}</v-card-title>
             <v-card-subtitle>{{ formatDate(comment.createdAt) }}</v-card-subtitle>
           </v-card-item>
-          <v-card-text>{{ comment.body }}</v-card-text>
+          <v-card-text>
+            <div class="markdown-body" v-html="renderMarkdown(comment.body)"></div>
+          </v-card-text>
         </v-card>
       </div>
 
@@ -90,7 +93,13 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
 import { Octokit } from '@octokit/rest';
+import { marked } from 'marked';
 import type { Issue, Comment } from '../types';
+
+// Configure marked to use synchronous mode
+marked.setOptions({
+  async: false
+});
 
 const props = defineProps<{
   issue?: Issue,
@@ -212,6 +221,12 @@ function cancelComment() {
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString();
 }
+
+// Function to render markdown
+function renderMarkdown(text: string): string {
+  if (!text) return '';
+  return marked.parse(text) as string;
+}
 </script>
 
 <style scoped>
@@ -244,8 +259,112 @@ function formatDate(date: string) {
   border: 1px solid var(--gh-border-default) !important;
 }
 
-:deep(.v-card-text) {
-  white-space: pre-wrap;
+:deep(.markdown-body) {
+  font-family: var(--gh-font-sans);
+  font-size: 14px;
+  line-height: 1.5;
   word-wrap: break-word;
+}
+
+:deep(.markdown-body h1),
+:deep(.markdown-body h2),
+:deep(.markdown-body h3),
+:deep(.markdown-body h4),
+:deep(.markdown-body h5),
+:deep(.markdown-body h6) {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+:deep(.markdown-body h1) { font-size: 2em; }
+:deep(.markdown-body h2) { font-size: 1.5em; }
+:deep(.markdown-body h3) { font-size: 1.25em; }
+:deep(.markdown-body h4) { font-size: 1em; }
+:deep(.markdown-body h5) { font-size: 0.875em; }
+:deep(.markdown-body h6) { font-size: 0.85em; }
+
+:deep(.markdown-body p) {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+:deep(.markdown-body code) {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: var(--gh-bg-inset);
+  border-radius: 6px;
+  font-family: var(--gh-font-mono);
+}
+
+:deep(.markdown-body pre) {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: var(--gh-bg-inset);
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+:deep(.markdown-body pre code) {
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border: 0;
+  word-break: normal;
+  white-space: pre;
+}
+
+:deep(.markdown-body blockquote) {
+  padding: 0 1em;
+  color: var(--gh-fg-muted);
+  border-left: 0.25em solid var(--gh-border-default);
+  margin: 0 0 16px 0;
+}
+
+:deep(.markdown-body ul),
+:deep(.markdown-body ol) {
+  padding-left: 2em;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+:deep(.markdown-body table) {
+  border-spacing: 0;
+  border-collapse: collapse;
+  margin: 16px 0;
+  width: 100%;
+}
+
+:deep(.markdown-body table th),
+:deep(.markdown-body table td) {
+  padding: 6px 13px;
+  border: 1px solid var(--gh-border-default);
+}
+
+:deep(.markdown-body table tr) {
+  background-color: var(--gh-bg-default);
+  border-top: 1px solid var(--gh-border-muted);
+}
+
+:deep(.markdown-body table tr:nth-child(2n)) {
+  background-color: var(--gh-bg-inset);
+}
+
+:deep(.markdown-body img) {
+  max-width: 100%;
+  box-sizing: content-box;
+  background-color: var(--gh-bg-default);
+}
+
+:deep(.markdown-body hr) {
+  height: 0.25em;
+  padding: 0;
+  margin: 24px 0;
+  background-color: var(--gh-border-default);
+  border: 0;
 }
 </style>
