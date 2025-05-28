@@ -51,8 +51,8 @@
         </div>
 
         <div class="panel panel-comments">
-          <v-card v-if="selectedIssue" class="gh-box h-100">
-            <comments-section :issue="selectedIssue" />
+          <v-card v-if="selectedIssue && selectedRepository" class="gh-box h-100">
+            <comments-section :issue="selectedIssue" :repository="selectedRepository" />
           </v-card>
           <v-card v-else class="gh-box h-100 d-flex align-center justify-center">
             <span class="gh-subtitle">Select an issue to view comments</span>
