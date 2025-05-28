@@ -1,8 +1,9 @@
 <!-- components/IssueList.vue -->
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { useEventBus, EVENTS } from '../composables/useEventBus';
+import CreateIssueForm from './CreateIssueForm.vue';
 
 // Define issue type
 interface Issue {
@@ -19,11 +20,12 @@ interface Issue {
   automationStatus?: 'pending' | 'in-progress' | 'completed' | 'failed';
   automationPriority?: 'low' | 'medium' | 'high';
   automationProgress?: number;
+  parentId?: number;
 }
 
 // Define props
 interface Props {
-  parentId?: number; // Optional parent issue ID when showing children
+  parentId?: number;
   showClosed?: boolean;
   showHeader?: boolean;
   maxHeight?: string | number;
@@ -47,27 +49,59 @@ const filterText = ref('');
 const showAutomationOnly = ref(false);
 const router = useRouter();
 const { emit: emitEvent } = useEventBus();
+const expandedParents = ref<Record<number, boolean>>({});
 
-// Filter issues based on search text and automation filter
-const filteredIssues = computed(() => {
-  let filtered = [...issues.value];
+// Toggle parent expansion
+const toggleParent = (issueId: number, event: Event) => {
+  event.stopPropagation();
+  expandedParents.value = {
+    ...expandedParents.value,
+    [issueId]: !expandedParents.value[issueId]
+  };
+};
+
+// Filter and organize issues hierarchically
+const hierarchicalIssues = computed(() => {
+  const filtered = [...issues.value].filter(issue => {
+    // Filter by search text
+    if (filterText.value) {
+      const searchLower = filterText.value.toLowerCase();
+      if (!(
+        issue.title.toLowerCase().includes(searchLower) || 
+        issue.body.toLowerCase().includes(searchLower) ||
+        issue.labels.some(label => label.toLowerCase().includes(searchLower))
+      )) {
+        return false;
+      }
+    }
+    
+    // Filter by automation
+    if (showAutomationOnly.value && !issue.isAutomation) {
+      return false;
+    }
+    
+    return true;
+  });
+
+  // Build hierarchy
+  const map: Record<number, Issue> = {};
+  const roots: Issue[] = [];
   
-  // Filter by search text
-  if (filterText.value) {
-    const searchLower = filterText.value.toLowerCase();
-    filtered = filtered.filter(issue => 
-      issue.title.toLowerCase().includes(searchLower) || 
-      issue.body.toLowerCase().includes(searchLower) ||
-      issue.labels.some(label => label.toLowerCase().includes(searchLower))
-    );
-  }
+  // Create a map of all issues
+  filtered.forEach(issue => {
+    map[issue.id] = { ...issue, children: [] };
+  });
   
-  // Filter by automation
-  if (showAutomationOnly.value) {
-    filtered = filtered.filter(issue => issue.isAutomation);
-  }
+  // Build the tree structure
+  filtered.forEach(issue => {
+    if (issue.parentId && map[issue.parentId]) {
+      map[issue.parentId].children?.push(map[issue.id]);
+    } else {
+      roots.push(map[issue.id]);
+    }
+  });
   
-  return filtered;
+  return roots;
 });
 
 // Get issues from the API
@@ -76,7 +110,6 @@ const fetchIssues = async () => {
   error.value = '';
   
   try {
-    // Construct API URL with parent ID if applicable
     const endpoint = props.parentId 
       ? `/api?type=issues&parentId=${props.parentId}&showClosed=${props.showClosed}` 
       : `/api?type=issues&showClosed=${props.showClosed}`;
@@ -89,25 +122,17 @@ const fetchIssues = async () => {
     
     const data = await response.json();
     
-    // Process issues to identify automation tasks
     issues.value = data.map((issue: Issue) => {
-      // Check if this is an automation issue based on labels
       const isAutomation = issue.labels.some(label => 
         label === 'automation' || label === 'ai-task'
       );
       
-      // Extract automation metadata if available
-      // In a real app, this would come from the server
-      const automationStatus = isAutomation ? (issue.automationStatus || 'pending') : undefined;
-      const automationPriority = isAutomation ? (issue.automationPriority || 'medium') : undefined;
-      const automationProgress = isAutomation ? (issue.automationProgress || 0) : undefined;
-      
       return {
         ...issue,
         isAutomation,
-        automationStatus,
-        automationPriority,
-        automationProgress
+        automationStatus: isAutomation ? (issue.automationStatus || 'pending') : undefined,
+        automationPriority: isAutomation ? (issue.automationPriority || 'medium') : undefined,
+        automationProgress: isAutomation ? (issue.automationProgress || 0) : undefined
       };
     });
     
@@ -119,24 +144,40 @@ const fetchIssues = async () => {
   }
 };
 
-// Expose a refresh method for parent components
-defineExpose({ 
-  refresh: fetchIssues 
-});
-
-// View issue details
-const viewIssue = (issue: Issue) => {
-  // Emit the issue selection event both as a component event and via the event bus
-  emit('issue-selected', issue);
-  emitEvent(EVENTS.ISSUE_SELECTED, issue);
-  
-  // Only navigate if we're in the child issues view
-  if (props.parentId) {
-    router.push(`/issue/${issue.number}`);
+// Utility methods
+const getStatusColor = (status?: string) => {
+  if (!status) return '';
+  switch (status) {
+    case 'pending': return 'grey';
+    case 'in-progress': return 'orange';
+    case 'completed': return 'green';
+    case 'failed': return 'red';
+    default: return 'grey';
   }
 };
-
-// Update issue after creation
+const getStatusIcon = (status?: string) => {
+  if (!status) return '';
+  switch (status) {
+    case 'pending': return 'mdi-timer-sand';
+    case 'in-progress': return 'mdi-robot';
+    case 'completed': return 'mdi-check-circle';
+    case 'failed': return 'mdi-alert-circle';
+    default: return 'mdi-help-circle';
+  }
+};
+const getPriorityColor = (priority?: string) => {
+  if (!priority) return '';
+  switch (priority) {
+    case 'high': return 'red';
+    case 'medium': return 'blue';
+    case 'low': return 'green';
+    default: return 'grey';
+  }
+};
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString();
+};
 const handleIssueCreated = (newIssue: Issue) => {
   issues.value.unshift({
     ...newIssue,
@@ -149,53 +190,89 @@ const handleIssueCreated = (newIssue: Issue) => {
   });
 };
 
-// Format date string
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString();
-};
-
-// Get priority color
-const getPriorityColor = (priority?: string) => {
-  if (!priority) return '';
-  
-  switch (priority) {
-    case 'high': return 'red';
-    case 'medium': return 'blue';
-    case 'low': return 'green';
-    default: return 'grey';
-  }
-};
-
-// Get status color
-const getStatusColor = (status?: string) => {
-  if (!status) return '';
-  
-  switch (status) {
-    case 'pending': return 'grey';
-    case 'in-progress': return 'orange';
-    case 'completed': return 'green';
-    case 'failed': return 'red';
-    default: return 'grey';
-  }
-};
-
-// Get status icon
-const getStatusIcon = (status?: string) => {
-  if (!status) return '';
-  
-  switch (status) {
-    case 'pending': return 'mdi-timer-sand';
-    case 'in-progress': return 'mdi-robot';
-    case 'completed': return 'mdi-check-circle';
-    case 'failed': return 'mdi-alert-circle';
-    default: return 'mdi-help-circle';
+// View issue details
+const viewIssue = (issue: Issue) => {
+  emit('issue-selected', issue);
+  emitEvent(EVENTS.ISSUE_SELECTED, issue);
+  if (props.parentId) {
+    router.push(`/issue/${issue.number}`);
   }
 };
 
 // Fetch issues on mount
 onMounted(() => {
   fetchIssues();
+});
+
+defineExpose({ 
+  refresh: fetchIssues 
+});
+
+// Register IssueItem as a recursive component
+const IssueItem = defineComponent({
+  name: 'IssueItem',
+  props: {
+    issue: { type: Object, required: true },
+    level: { type: Number, default: 0 }
+  },
+  setup(props) {
+    const hasChildren = computed(() => props.issue.children && props.issue.children.length > 0);
+    const isExpanded = computed(() => expandedParents.value[props.issue.id] ?? false);
+    return { hasChildren, isExpanded, toggleParent, getStatusColor, getStatusIcon, viewIssue, expandedParents };
+  },
+  template: `
+    <v-list-item
+      :value="issue"
+      @click="viewIssue(issue)"
+      :class="{
+        'border-l-4 border-purple': issue.isAutomation,
+      }"
+      :style="{ 'padding-left': (16 + (level * 16)) + 'px' }"
+      hover
+    >
+      <template v-slot:prepend>
+        <v-icon
+          v-if="hasChildren"
+          @click.stop="toggleParent(issue.id, $event)"
+          size="small"
+          class="mr-1"
+        >
+          {{ isExpanded ? 'mdi-chevron-down' : 'mdi-chevron-right' }}
+        </v-icon>
+        <v-icon
+          v-else
+          size="small"
+          class="mr-1"
+          :color="getStatusColor(issue.automationStatus)"
+        >
+          {{ getStatusIcon(issue.automationStatus) }}
+        </v-icon>
+      </template>
+      <v-list-item-title class="d-flex align-center">
+        <span class="text-body-2">#{{ issue.number }}</span>
+        <span class="text-body-2 ml-2">{{ issue.title }}</span>
+      </v-list-item-title>
+      <template v-slot:append>
+        <v-chip
+          v-if="issue.isAutomation"
+          size="x-small"
+          color="purple"
+          class="mr-1"
+        >
+          AI
+        </v-chip>
+        <v-chip
+          :color="issue.state === 'open' ? 'success' : 'error'"
+          size="x-small"
+        >
+          {{ issue.state }}
+        </v-chip>
+      </template>
+    </v-list-item>
+    <div v-if="hasChildren && isExpanded" class="child-issues">
+      <IssueItem v-for="child in issue.children" :key="child.id" :issue="child" :level="level + 1" />
+    </div>
+  `
 });
 </script>
 
@@ -246,43 +323,34 @@ onMounted(() => {
     </v-alert>
     
     <!-- Empty state -->
-    <v-card v-else-if="filteredIssues.length === 0" class="text-center pa-4 my-4" variant="outlined">
+    <v-card v-else-if="hierarchicalIssues.length === 0" class="text-center pa-4 my-4" variant="outlined">
       <div class="text-body-1 py-4">No issues found</div>
     </v-card>
     
     <!-- Issues list -->
     <v-list density="compact" class="pa-0">
-      <v-list-item
-        v-for="issue in filteredIssues"
-        :key="issue.id"
-        :value="issue"
-        @click="viewIssue(issue)"
-        :class="{
-          'border-l-4 border-purple': issue.isAutomation
-        }"
-        hover
-      >
-        <template v-slot:prepend>
-          <v-icon :color="getStatusColor(issue.automationStatus)" size="small">
-            {{ getStatusIcon(issue.automationStatus) }}
-          </v-icon>
-        </template>
-
-        <v-list-item-title class="d-flex align-center">
-          <span class="text-body-2">#{{ issue.number }}</span>
-          <span class="text-body-2 ml-2">{{ issue.title }}</span>
-        </v-list-item-title>
-
-        <template v-slot:append>
-          <v-chip
-            v-if="issue.isAutomation"
-            size="x-small"
-            color="purple"
-          >
-            AI
-          </v-chip>
-        </template>
-      </v-list-item>
+      <template v-for="issue in hierarchicalIssues" :key="issue.id">
+        <IssueItem :issue="issue" />
+      </template>
     </v-list>
   </div>
 </template>
+
+<style scoped>
+.child-issues {
+  transition: all 0.3s ease;
+}
+
+.border-purple {
+  border-color: rgb(186, 104, 200);
+}
+
+/* Add some visual hierarchy */
+.v-list-item {
+  transition: background-color 0.2s;
+}
+
+.v-list-item--active {
+  background-color: rgba(25, 118, 210, 0.08);
+}
+</style>
