@@ -110,8 +110,8 @@ const loginWithGitHub = () => {
   // Construct URL with URLSearchParams for proper encoding
   const authUrl = new URL('https://github.com/login/oauth/authorize');
   const params = new URLSearchParams({
-    client_id: 'Ov23liMrCpSFajxWzoYp',
-    redirect_uri: 'http://localhost:3001/auth/callback',
+    client_id: 'Ov23liptha6LD3YcOD8t',
+    redirect_uri: 'http://localhost:3000/auth/callback',
     scope: 'repo user',
     state: state,
     prompt: 'login',          // Force credential entry

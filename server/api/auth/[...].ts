@@ -1,9 +1,9 @@
 import { defineEventHandler, parseCookies, setCookie, sendRedirect, getQuery, readBody } from 'h3';
 
 const config = {
-  clientId: 'Ov23liMrCpSFajxWzoYp',
-  clientSecret: '4473bd898c5b8814a9e223756c82fd7df3de03d6',
-  redirectUri: 'http://localhost:3001/auth/callback'
+  clientId:'Ov23liptha6LD3YcOD8t',
+  clientSecret: '5d92fd26e55de7ba0af2d2c148ac3d28c4ead658',
+  redirectUri: 'http://localhost:3000/auth/callback'
 };
 
 export default defineEventHandler(async (event) => {
