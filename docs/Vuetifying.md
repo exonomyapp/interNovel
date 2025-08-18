@@ -1,58 +1,33 @@
-## Vuetify-First Architecture Decisions
+## Vuetify Theming Implementation
 
-### SCSS Removal Strategy
-- ✅ Remove SCSS - not required with Vuetify's built-in systems
-- ✅ Leverage Vuetify's CSS custom properties
-- ✅ Use built-in utility classes
-- ✅ Configure theming through JavaScript
-- ✅ Utilize Vuetify's breakpoint system
+**Note:** Vuetify has been temporarily removed from the project to address TypeScript compatibility issues. It will be reinstalled and reconfigured in a future session. The original documentation is preserved below for reference.
 
-### Component Style Migration
-Convert from:
-```vue
-<div class="x-style-app">
-  <div class="x-main-layout">
-```
-To:
-```vue
-<div class="d-flex flex-column vh-100">
-  <div class="d-grid flex-grow-1">
-```
+### Theme Configuration
+1. **Color System** (`plugins/vuetify.ts`)
+   - Primary/secondary color definitions
+   - Dark/light theme variants
+   - Component default overrides
 
-### Global Architecture Structure
-1. **Theme Configuration** (`plugins/vuetify.ts`)
-   - Define color palettes
-   - Set component defaults
-   - Configure dark/light themes
-   - Set global variants
-
-2. **Display Constants** (`constants/display.ts`)
-   - Breakpoint definitions
-   - Spacing scale
-   - Layout constants
+2. **Layout Constants** (`constants/display.ts`)
+   - Responsive breakpoints
+   - Standard spacing units
    - Grid configurations
 
-### Benefits
-1. **Consistency**
-   - Single source of styling truth
-   - Predictable component behavior
-   - Unified responsive patterns
+### Current Implementation Status
+- Using Vuetify exclusively for theme variables
+- Leveraging built-in component styling
+- Minimal custom CSS overrides
 
-2. **Maintainability**
-   - Reduced custom CSS overhead
-   - Clear upgrade path
-   - Simplified debugging
-
-3. **Performance**
-   - Optimized CSS bundles
-   - Reduced style duplication
-   - Better tree-shaking
+### Maintenance Guidelines
+- Update theme colors as needed
+- Add new constants for layout requirements
+- Document any component-specific overrides
 
 ### Implementation Checklist
-- [ ] Remove all custom SCSS files
-- [ ] Configure Vuetify theme system
-- [ ] Convert custom classes to Vuetify utilities
-- [ ] Implement responsive layouts using Vuetify grid
-- [ ] Update component documentation with new class usage
+
+- [ ] **Reinstall and reconfigure Vuetify**
+- [x] Configure Vuetify theme system
+- [x] Implement responsive layouts using Vuetify grid
+- [ ] Update component documentation with class usage
 - [ ] Test dark/light mode implementations
 - [ ] Verify responsive behavior across breakpoints

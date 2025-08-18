@@ -1,4 +1,4 @@
-# Implementation Plan
+# Internovel Implementation Plan
 
 This document outlines the plan for implementing the features described in the functional specification, guided by the project vision and product plan.
 
@@ -6,41 +6,46 @@ This document outlines the plan for implementing the features described in the f
 
 This section will define the key dates and milestones for the implementation process.
 
-*   **Start Date:** [Insert Project Start Date]
-*   **End Date (Target):** [Insert Project Target End Date]
+*   **Start Date:** 
+*   **End Date (Target):** 
 
 **Key Milestones:**
 
-*   **Milestone 1:** [Describe Milestone 1] - Target Completion: [Insert Date]
-*   **Milestone 2:** [Describe Milestone 2] - Target Completion: [Insert Date]
-*   **Milestone 3:** [Describe Milestone 3] - Target Completion: [Insert Date]
-*   ... (Add more milestones as needed)
+*   [ ] **Milestone 1:** Core DID Integration - Target Completion: 
+*   [ ] **Milestone 2:** Character Management - Target Completion: 
+*   [ ] **Milestone 3:** Novel Structure Features - Target Completion: 
 
-## 2. Resource Allocation
 
-This section will detail the resources allocated to the project.
 
-*   **Team Members:**
-    *   [Team Member Name 1] - Role: [Role] - Responsibilities: [Key Responsibilities]
-    *   [Team Member Name 2] - Role: [Role] - Responsibilities: [Key Responsibilities]
-    *   ... (Add more team members as needed)
-*   **Tools and Technologies:** [List key tools and technologies]
-*   **Budget (if applicable):** [Insert Budget Information]
+## 4. Bug Fixes and Maintenance
 
-## 3. Implementation Tasks (Structured as Potential GitHub Issues)
+This section tracks bug fixes and maintenance tasks performed on the platform.
 
-This section breaks down the implementation work into individual tasks, formatted to facilitate the creation of GitHub Issues. Each task includes a title, suggested labels, potential assignees, and a detailed description that will form the body of the corresponding GitHub Issue.
+### Vuetify Plugin Errors
 
-### Task Category: Decentralized Identity
+*   **Context:** The `plugins/vuetify.ts` file had errors related to the `defineNuxtPlugin` function and the `nuxtApp` parameter type.
+*   **Resolution:**
+    *   Added the correct import for `defineNuxtPlugin` from `#app`.
+    *   Added the `NuxtApp` type to the `nuxtApp` parameter.
 
-#### **Task Title:** Implement DID Generation and Management
+### Supabase Client Import Error
 
-*   **Labels:** `feature`, `backend`, `frontend`, `DID`, `MVP1`
-*   **Assignees:** [Suggested Assignee(s)]
+*   **Context:** The `stores/auth.ts` file had an error with the import of `useSupabaseClient`.
+*   **Resolution:** Changed the import to a default import.
 
-**Description:**
+### TSConfig Errors
 
-*   **Context:** This task involves implementing the core functionality for users to generate and manage their Decentralized Identifiers (DIDs) within the InterNovel platform, as outlined in the "Decentralized Identity at the Core" section of `vision-scope.md` and the "Fair Attribution" section of `functional-spec.md`. This is fundamental for enabling immutable attribution of creative contributions.
+*   **Context:** The `tsconfig.json` file was showing errors because the files it was extending were not found.
+*   **Resolution:** Ran `npm install` to trigger `nuxt prepare` and generate the necessary files in the `.nuxt` directory.
+
+
+This section details the implementation of Internovel's core features, focusing on collaborative writing and content management.
+
+### Feature Category: Decentralized Identity
+
+#### **Feature:** Implement DID Generation and Management
+
+*   **Context:** This involves implementing the core functionality for users to generate and manage their Decentralized Identifiers (DIDs) within the Internovel platform. This is fundamental for enabling immutable attribution of creative contributions.
 *   **Requirements:**
     *   Users must be able to generate a `did:key` upon account creation or in their profile settings.
     *   The platform must securely store the encrypted private keys in the user's browser using IndexedDB.
@@ -52,36 +57,37 @@ This section breaks down the implementation work into individual tasks, formatte
     *   The generated DID is a valid `did:key`.
     *   The encrypted private key is securely stored in IndexedDB.
     *   The user can view their public DID in the application.
-*   **Notes/Considerations:** Consider the user experience for key backup and recovery. Address potential security vulnerabilities related to key management in the browser.
+*   [ ] **Notes/Considerations:** Consider the user experience for key backup and recovery. Address potential security vulnerabilities related to key management in the browser.
 
-#### **Task Title:** Implement DID-Based Authentication
+#### **Feature:** Implement DID-Based Authentication
 
-*   **Labels:** `feature`, `backend`, `authentication`, `DID`, `MVP1`
-*   **Assignees:** [Suggested Assignee(s)]
-
-**Description:**
-
-*   **Context:** This task focuses on implementing the challenge-response authentication mechanism using the user's DID, as described in the "Decentralized Identity at the Core" section of `product-plan.md` and `vision-scope.md`. This provides a decentralized method for user authentication.
+*   **Context:** This focuses on implementing the challenge-response authentication mechanism using the user's DID. This provides a decentralized method for user authentication.
 *   **Requirements:**
     *   The backend must generate a unique challenge for the user during the login process.
     *   The frontend must use the user's private key to sign the challenge.
     *   The backend must verify the signature using the user's public DID.
-    *   Upon successful verification, the backend should issue a JWT for subsequent authenticated requests.
-*   **Technical Approach:** Develop backend endpoints for issuing challenges and verifying signatures. Implement frontend logic to handle the signing process using the Web Crypto API. Integrate with the JWT token issuance mechanism.
+
+*   **Technical Approach:** 
+    *   Backend endpoints for issuing challenges and verifying signatures
+    *   Frontend logic using Web Crypto API for signing
+    *   Integration with JWT token issuance
+    *   Implemented in `useDidAuth.ts` composable with:
+        *   `createChallenge()` - Generates random challenge
+        *   `signChallenge()` - Signs with private key from `useDid`
+        *   `verifySignature()` - Verifies using public key
 *   **Acceptance Criteria:**
     *   A user can successfully log in using their DID.
     *   The authentication process utilizes a challenge-response mechanism.
-    *   A valid JWT is issued upon successful authentication.
-*   **Notes/Considerations:** Ensure the challenge is truly random and single-use. Implement appropriate security measures to prevent replay attacks.
+    *   Challenges are single-use and time-limited
 
-#### **Task Title:** Implement Cryptographic Linking of Contributions to DID
+*   [x] **Implementation Complete:**
+    *   Added challenge-response flow in `useDidAuth.ts`
+    *   Integrated with existing auth system
+    *   Added security measures against replay attacks
 
-*   **Labels:** `feature`, `backend`, `frontend`, `DID`, `attribution`, `MVP1`
-*   **Assignees:** [Suggested Assignee(s)]
+#### **Feature:** Implement Cryptographic Linking of Contributions to DID
 
-**Description:**
-
-*   **Context:** This task is crucial for ensuring immutable attribution of creative contributions by cryptographically linking them to the author's DID, as detailed in the "Fair Attribution" section of `functional-spec.md` and the "Decentralized Identity at the Core" sections of `product-plan.md` and `vision-scope.md`. This is fundamental for enabling immutable attribution of creative contributions.
+*   **Context:** This is crucial for ensuring immutable attribution of creative contributions by cryptographically linking them to the author's DID. This is fundamental for enabling immutable attribution of creative contributions.
 *   **Requirements:**
     *   When a user makes a contribution (e.g., adding a paragraph, defining a character element), the contribution data must be signed by the user's private key.
     *   The signature and the user's DID must be stored alongside the contribution data in the database.
@@ -91,18 +97,13 @@ This section breaks down the implementation work into individual tasks, formatte
     *   Every creative contribution is associated with the author's DID and a valid cryptographic signature.
     *   The platform can verify the signature of a contribution using the author's public DID.
     *   Attribution information (linked to the DID) is displayed for each contribution.
-*   **Notes/Considerations:** Determine the granularity of contributions to be signed (e.g., per paragraph, per section). Consider the performance implications of signing and verifying contributions.
+*   [ ] **Notes/Considerations:** Determine the granularity of contributions to be signed (e.g., per paragraph, per section). Consider the performance implications of signing and verifying contributions.
 
-### Task Category: Character Travel Trunk
+### Feature Category: Character Universe Management
 
-#### **Task Title:** Implement Character Travel Trunk Creation and Management
+#### [x] **Feature:** Implement Character Travel Trunk Creation and Management
 
-*   **Labels:** `feature`, `backend`, `frontend`, `character-portability`, `MVP1`
-*   **Assignees:** [Suggested Assignee(s)]
-
-**Description:**
-
-*   **Context:** This task focuses on building the core functionality for authors to create and manage the "Character Travel trunk" for their original characters, as described in `vision-scope.md` and `product-plan.md`, and the "Character Portability & Cross-Narrative Potential" section of `functional-spec.md`. This enables characters to be proposed for inclusion in other stories.
+*   **Context:** This focuses on building the core functionality for authors to create and manage the "Character Travel trunk" for their original characters. This enables characters to be proposed for inclusion in other stories.
 *   **Requirements:**
     *   Users must be able to create a "Travel trunk" for a character they own.
     *   The "Travel trunk" must include a narrative sample featuring the character and a link to the character's comprehensive bio page.
@@ -114,16 +115,11 @@ This section breaks down the implementation work into individual tasks, formatte
     *   The trunk includes a narrative sample and a valid link to the character's bio.
     *   Authors can update the trunk and bio information.
     *   The character bio page displays thematic interests, topics, and preferences.
-*   **Notes/Considerations:** Define the structure and format for narrative samples and character bios. Consider how to handle links to bio pages within the platform.
+*   [x] **Notes/Considerations:** Define the structure and format for narrative samples and character bios. Consider how to handle links to bio pages within the platform.
 
-#### **Task Title:** Implement Character Travel Trunk Proposal System
+#### [x] **Feature:** Implement Character Travel Trunk Proposal System
 
-*   **Labels:** `feature`, `backend`, `frontend`, `character-portability`, `collaboration`, `MVP1`
-*   **Assignees:** [Suggested Assignee(s)]
-
-**Description:**
-
-*   **Context:** This task involves building the system for authors to propose the inclusion of a character (via their Travel Trunk) into another author's story, as detailed in `vision-scope.md` and `product-plan.md`. This facilitates cross-narrative collaboration.
+*   **Context:** This involves building the system for authors to propose the inclusion of a character (via their Travel Trunk) into another author's story. This facilitates cross-narrative collaboration.
 *   **Requirements:**
     *   An author must be able to initiate a proposal to the original author of a character (either directly or from the Casting Studio).
     *   The proposal should include details on how the inviting author envisions integrating the character into their novel.
@@ -136,18 +132,36 @@ This section breaks down the implementation work into individual tasks, formatte
     *   The original author receives and can view the proposal details.
     *   The original author can accept or reject the proposal.
     *   Accepting a proposal provides options for granting permissions and collaboration.
-*   **Notes/Considerations:** Design a clear and intuitive user interface for the proposal process. Consider notification systems for new proposals and responses.
+*   [x] **Notes/Considerations:** Design a clear and intuitive user interface for the proposal process. Consider notification systems for new proposals and responses.
 
-### Task Category: Novel Spine
+### Feature Category: Community & Discovery
 
-#### **Task Title:** Implement Novel Spine and Vertebrae Creation
+#### **Feature:** Implement the Casting Studio
 
-*   **Labels:** `feature`, `backend`, `frontend`, `novel-structure`, `MVP1`
-*   **Assignees:** [Suggested Assignee(s)]
+*   **Context:** This feature provides a public space for authors to showcase their characters and for other authors to discover them for potential collaboration.
+*   **Requirements:**
+    *   Authors must be able to mark their characters as "publicly listed" to appear in the Casting Studio.
+    *   The Casting Studio will display a gallery of all publicly listed characters.
+    *   Each character card in the gallery should display key information (name, a short bio snippet) and link to the full character view/travel trunk.
+    *   Implement search and filtering capabilities for the Casting Studio (Post-MVP1).
+*   **Technical Approach:**
+    *   Add a `listed` boolean column to the `characters` table in `server/db/schema.ts`.
+    *   Generate a new database migration for the schema change.
+    *   Create a new API endpoint `GET /api/casting-studio` to fetch all listed characters.
+    *   Create a new API endpoint `PATCH /api/characters/:id` to update the `listed` status.
+    *   Create a `CastingStudio.vue` component to display the characters.
+    *   Add a toggle switch to the character management UI to allow authors to list/unlist their characters.
+*   **Acceptance Criteria:**
+    *   An author can toggle the visibility of their character in the Casting Studio.
+    *   The Casting Studio page displays all characters marked as public.
+    *   Clicking on a character in the studio navigates to the character's detail page.
+*   [ ] **Notes/Considerations:** The initial implementation will be a simple gallery. Search and filtering will be added later.
 
-**Description:**
+### Feature Category: Collaborative Novel Structure
 
-*   **Context:** This task focuses on building the core functionality of the "Novel Spine," allowing authors to structure their stories using "Vertebrae" representing ideas and plot points, as described in `vision-scope.md` and `product-plan.md`, and the "Non-Linear Idea Development" section of `functional-spec.md`.
+#### **Feature:** Implement Novel Spine and Vertebrae Creation
+
+*   **Context:** This focuses on building the core functionality of the "Novel Spine," allowing authors to structure their stories using "Vertebrae" representing ideas and plot points.
 *   **Requirements:**
     *   Authors must be able to create a "Novel Spine" for their novel.
     *   Authors must be able to add "Vertebrae" to the Spine, representing ideas, plot points, or thematic elements.
@@ -157,16 +171,11 @@ This section breaks down the implementation work into individual tasks, formatte
     *   An author can create a Novel Spine for their novel.
     *   An author can add new Vertebrae to the Spine.
     *   Vertebrae can store a title and description.
-*   **Notes/Considerations:** Consider the initial structure of the Spine and how Vertebrae will be ordered by default.
+*   [ ] **Notes/Considerations:** Consider the initial structure of the Spine and how Vertebrae will be ordered by default.
 
-#### **Task Title:** Implement Manual Time Stamping for Vertebrae
+#### **Feature:** Implement Manual Time Stamping for Vertebrae
 
-*   **Labels:** `feature`, `backend`, `frontend`, `novel-structure`, `MVP1`
-*   **Assignees:** [Suggested Assignee(s)]
-
-**Description:**
-
-*   **Context:** This task involves adding the ability to manually time stamp Vertebrae within the Novel Spine to establish an underlying chronological framework, as detailed in `vision-scope.md` and the "Non-Linear Idea Development" section of `functional-spec.md`.
+*   **Context:** This involves adding the ability to manually time stamp Vertebrae within the Novel Spine to establish an underlying chronological framework.
 *   **Requirements:**
     *   Authors must be able to manually assign a time stamp to each Vertebra.
     *   The platform should store and maintain the chronological order based on these time stamps.
@@ -176,16 +185,11 @@ This section breaks down the implementation work into individual tasks, formatte
     *   An author can assign a manual time stamp to a Vertebra.
     *   The platform stores the assigned time stamp.
     *   Authors can edit existing time stamps.
-*   **Notes/Considerations:** Define the format and precision of the manual time stamp. Consider how to handle potential conflicts or ambiguities in time stamping.
+*   [ ] **Notes/Considerations:** Define the format and precision of the manual time stamp. Consider how to handle potential conflicts or ambiguities in time stamping.
 
-#### **Task Title:** Implement Tagging and Categorization of Vertebrae
+#### **Feature:** Implement Tagging and Categorization of Vertebrae
 
-*   **Labels:** `feature`, `backend`, `frontend`, `novel-structure`, `theming`, `MVP1`
-*   **Assignees:** [Suggested Assignee(s)]
-
-**Description:**
-
-*   **Context:** This task focuses on enabling authors to tag Vertebrae with themes and topics for organization and analysis, as described in `vision-scope.md` and the "Non-Linear Idea Development" section of `functional-spec.md`.
+*   **Context:** This focuses on enabling authors to tag Vertebrae with themes and topics for organization and analysis.
 *   **Requirements:**
     *   Authors must be able to define custom themes and topics.
     *   Authors must be able to associate one or more themes and topics with each Vertebra.
@@ -195,9 +199,42 @@ This section breaks down the implementation work into individual tasks, formatte
     *   An author can create new themes and topics.
     *   An author can tag a Vertebra with existing themes and topics.
     *   The platform stores the theme and topic associations for each Vertebra.
-*   **Notes/Considerations:** Consider how themes and topics will be managed globally vs. per novel.
+*   [ ] **Notes/Considerations:** Consider how themes and topics will be managed globally vs. per novel.
 
-#### **Task Title:** Implement Visual Overview and Dynamic Arrangement of Novel Spine
+#### **Feature:** Implement Visual Overview and Dynamic Arrangement of Novel Spine
+
+*   **Context:** This task focuses on developing a visual representation of the novel's spine, allowing authors to intuitively understand and manipulate the narrative flow.
+*   **Requirements:**
+    *   The platform must display a visual overview of the Novel Spine, showing the order and relationships of Vertebrae.
+    *   Authors should be able to dynamically rearrange Vertebrae within the visual interface.
+    *   The visual representation should reflect time stamps and tags.
+*   **Technical Approach:** Utilize a suitable frontend library for interactive diagrams or graphs (e.g., D3.js, Vue Flow). Implement drag-and-drop functionality for rearranging Vertebrae. Develop logic to render Vertebrae based on their time stamps and tags.
+*   **Acceptance Criteria:**
+    *   A visual representation of the Novel Spine is displayed.
+    *   Authors can rearrange Vertebrae using drag-and-drop.
+    *   The visual overview accurately reflects time stamps and tags.
+*   [ ] **Notes/Considerations:** Optimize for performance with a large number of Vertebrae. Consider different layout options for the visual overview.
+
+## 4. Technology Stack
+
+-   **Frontend:** Nuxt.js (Vue.js 3), Vuetify 3
+-   **Backend:** Nuxt.js 3 server-side capabilities
+-   **Database:** Supabase (PostgreSQL) and OrbitDB in tandem for resilient content hosting. Write operations prioritize local Helia OrbitDB then trigger Supabase. Read operations attempt Supabase first with fallback to OrbitDB.
+-   **Authentication:** Custom DID-based authentication
+-   **Version Control:** Git/GitHub for collaborative writing and document management
+
+## 5. Deployment
+
+-   **Hosting:** Vercel (for frontend), Supabase (for backend and database)
+-   **CI/CD:** GitHub Actions for automated testing and deployment
+
+## 6. Milestones
+
+-   **Milestone 1:** Core DID Integration and basic Character Management.
+-   **Milestone 2:** Advanced Character Features and initial Novel Structure functionality.
+-   **Milestone 3:** Full Novel Structure and deployment readiness.
+
+This plan is subject to change based on feedback and development progress.
 
 *   **Labels:** `feature`, `frontend`, `novel-structure`, `visualization`, `MVP1`
 *   **Assignees:** [Suggested Assignee(s)]

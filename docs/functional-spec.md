@@ -9,7 +9,7 @@ This document provides detailed functional specifications for the features outli
 **Proposal:** Implement a DID-based attribution system where all creative contributions (paragraphs, character elements, plot points) are cryptographically linked to the author's DID.
 
 *   **Details:**
-    *   Use W3C Decentralized Identifiers (DIDs) to anchor user identities.
+    *   Use W3C Decentralized Identifiers (DIDs) to anchor user identities in both Supabase and OrbitDB.
     *   Cryptographically sign contributions with the author's DID.
     *   Display attribution information clearly and transparently within the platform.
 *   **UX Principles:** Clarity, Simplicity & Intuitiveness
@@ -22,7 +22,7 @@ This document provides detailed functional specifications for the features outli
 **Proposal:** Streamline document management and provide flexible integration with a variety of external services through optional third-party authentication.
 
 *   **Details:**
-    *   **Document Storage Integration:** Allow users to connect accounts from third-party services (e.g., GitHub, GitLab, Google Docs) to store the actual text files of their novels.
+    *   **Document Storage Integration:** Internovel will primarily use Supabase and OrbitDB in tandem for robust document storage. This dual approach ensures content availability even if one service is unavailable. Users can also connect accounts from third-party services (e.g., GitHub, GitLab, Google Docs) to store the actual text files of their novels, with DIDs used across all storage solutions.
     *   **Broader External Service Integration:** Support connecting accounts from various third-party service providers beyond just document storage.
     *   **Optional Third-Party Authentication:** Implement a mechanism for users to optionally authenticate with third-party services. This authentication is separate from the core InterNovel platform authentication and is not required for basic platform usage.
     *   **Leveraging External Resources:** Enable users to leverage features and resources from connected third-party services that can enhance their writing process. Examples include:
@@ -83,9 +83,11 @@ This document provides detailed functional specifications for the features outli
 **Proposal:** Further develop the "Character Travel trunk" concept to facilitate character portability and cross-narrative potential.
 
 *   **Details:**
-    *   Allow authors to define detailed character bios, thematic preferences, and writing samples.
-    *   Provide tools for managing character permissions and licensing.
-    *   Enable authors to track the usage of their characters in other stories.
+    *   A `characters` table stores character information, including name, bio, and a link to the owner's user ID.
+    *   A `travel_trunks` table stores narrative samples for each character, including the content and type of sample.
+    *   A `proposals` table manages requests to use a character in another narrative, tracking the status of the proposal.
+    *   API endpoints are available to create, retrieve, and manage characters and their travel trunk items.
+    *   A dedicated UI component, `CharacterTravelTrunk.vue`, provides the user interface for this feature.
 *   **UX Principles:** Flexibility, Engagement
 *   **Notes for Developers:** Integrate with the DID-based attribution and licensing systems.
 
@@ -95,7 +97,7 @@ This document provides detailed functional specifications for the features outli
 
 **Proposal:** Enhance community features to facilitate character and novel discovery and collaboration.
 
-## 8. The Casting Studio: Functional Specification
+## [ ] 8. The Casting Studio: Functional Specification
 
 **Problem:** Providing a dedicated space for authors to showcase and discover characters for collaboration.
 

@@ -1,5 +1,9 @@
 # Internovel Platform: Project Documentation and Technical Overview (Enhanced)
 
+## Project Status
+
+**Note on Project Status:** We are beginning the development of the Internovel application. All new code added to this repository is part of the current development effort. The existing documentation (`docs/`) is from a previous iteration of the project. While `vision-scope.md`, `product-plan.md`, and `feature-guide.md` serve as the guiding plan for the new application, the `functional-spec.md` and `implementation-plan.md` will be updated concurrently with the codebase. Other documents will be updated as new features require.
+
 ## Table of Contents
 1. [Project Vision and Purpose](#project-vision-and-purpose)
 2. [Core Value Propositions](#core-value-propositions)
@@ -99,7 +103,14 @@ The platform uses a combination of traditional authentication methods and decent
 
 The platform employs a PostgreSQL database managed by Supabase.
 
-- **PostgreSQL (Supabase)**: For storing structured data such as user profiles, content metadata, Novel Spine structures, Vertebrae content, section, theme, and topic definitions and associations, collaboration states, character bios, "Travel trunk" information, and Casting Studio/Novel Café data.
+- **PostgreSQL (Supabase)**: For storing structured data...
+  - Authentication handled via `useSupabaseClient()` composable auto-imported from `@nuxtjs/supabase`
+  - Client initialization occurs in Pinia store actions (signIn, signUp, signOut, fetchUser)
+  - Authentication flow:
+    - Home page loads without signed-in user by default
+    - DID selector dropdown appears on home page for unsigned users
+    - Signed-in users see their avatar and display name in UI (not dropdown)
+    - Last signed-in user is remembered (selected in dropdown but not automatically signed in) for quick re-login
 - **Drizzle ORM**: Used for type-safe schema definition, migrations, and database interactions.
 
 ### API Structure
