@@ -47,10 +47,11 @@ This section details the implementation of Internovel's core features, focusing 
 
 *   **Context:** This involves implementing the core functionality for users to generate and manage their Decentralized Identifiers (DIDs) within the Internovel platform. This is fundamental for enabling immutable attribution of creative contributions.
 *   **Requirements:**
-    *   Users must be able to generate a `did:key` upon account creation or in their profile settings.
+    *   Users must be able to generate a `did:peer` upon account creation or in their profile settings. The `did:peer` method is selected for its ability to support DID document updates, which is crucial for evolving user profiles and service endpoints without relying on a blockchain.
     *   The platform must securely store the encrypted private keys in the user's browser using IndexedDB.
+    *   User-uploaded assets, such as avatars and profile documents, will be stored on Helia IPFS to ensure decentralized, content-addressed storage.
     *   Provide a user interface for managing their DID, including viewing the public DID.
-    *   Ensure the implementation adheres to W3C DID specifications for the `did:key` method.
+    *   Ensure the implementation adheres to W3C DID specifications for the `did:peer` method.
 *   **Technical Approach:** Utilize the Web Crypto API for key generation and cryptographic operations. Implement secure storage mechanisms using IndexedDB. Develop frontend components for user interaction and backend logic for handling DID-related operations.
 *   **Acceptance Criteria:**
     *   A new user can successfully generate a DID.

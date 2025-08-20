@@ -1,5 +1,5 @@
-import { db } from '~/server/db';
-import { characters, insertCharacterSchema } from '~/server/db/schema';
+import { db } from '../../utils/db';
+import { characters, insertCharacterSchema } from '../../db/schema';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);

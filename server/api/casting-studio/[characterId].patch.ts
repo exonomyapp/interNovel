@@ -1,5 +1,5 @@
-import { db } from '~/server/db';
-import { characters, eq } from '~/server/db/schema';
+import { db } from '../../utils/db';
+import { characters, eq } from '../../db/schema';
 
 export default defineEventHandler(async (event) => {
   const characterId = getRouterParam(event, 'characterId');

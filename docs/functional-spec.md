@@ -9,7 +9,8 @@ This document provides detailed functional specifications for the features outli
 **Proposal:** Implement a DID-based attribution system where all creative contributions (paragraphs, character elements, plot points) are cryptographically linked to the author's DID.
 
 *   **Details:**
-    *   Use W3C Decentralized Identifiers (DIDs) to anchor user identities in both Supabase and OrbitDB.
+    *   Use the `did:peer` method for W3C Decentralized Identifiers (DIDs) to anchor user identities. This method is chosen for its ability to support DID document updates without requiring a blockchain, making it ideal for evolving user profiles and service endpoints.
+    *   Use Helia IPFS and OrbitDB for decentralized storage of user-generated content and data. This ensures data persistence, censorship resistance, and content-based addressing.
     *   Cryptographically sign contributions with the author's DID.
     *   Display attribution information clearly and transparently within the platform.
 *   **UX Principles:** Clarity, Simplicity & Intuitiveness
@@ -22,7 +23,7 @@ This document provides detailed functional specifications for the features outli
 **Proposal:** Streamline document management and provide flexible integration with a variety of external services through optional third-party authentication.
 
 *   **Details:**
-    *   **Document Storage Integration:** Internovel will primarily use Supabase and OrbitDB in tandem for robust document storage. This dual approach ensures content availability even if one service is unavailable. Users can also connect accounts from third-party services (e.g., GitHub, GitLab, Google Docs) to store the actual text files of their novels, with DIDs used across all storage solutions.
+    *   **Document Storage Integration:** Internovel will primarily use OrbitDB on top of Helia IPFS for robust, decentralized document storage. A local PostgreSQL instance will serve as a read-optimized cache, synchronized with OrbitDB. This dual approach ensures content availability and performance.
     *   **Broader External Service Integration:** Support connecting accounts from various third-party service providers beyond just document storage.
     *   **Optional Third-Party Authentication:** Implement a mechanism for users to optionally authenticate with third-party services. This authentication is separate from the core InterNovel platform authentication and is not required for basic platform usage.
     *   **Leveraging External Resources:** Enable users to leverage features and resources from connected third-party services that can enhance their writing process. Examples include:

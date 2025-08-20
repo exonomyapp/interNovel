@@ -1,10 +1,10 @@
 <template>
   <v-app>
     <v-main>
-      <v-container class="fill-height" fluid>
+      <v-container fluid>
         <v-row align="center" justify="center">
           <v-col cols="12" sm="8" md="6">
-            <v-card class="elevation-12">
+            <v-card>
               <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>Authentication</v-toolbar-title>
               </v-toolbar>

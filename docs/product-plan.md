@@ -42,7 +42,7 @@ This section outlines the core features planned for the Minimum Viable Product (
 
 ### Decentralized Identity at the Core
 
-Each user's InterNovel identity is anchored to a W3C Decentralized Identifier (DID), utilizing the `did:key` method for MVP1. Users generate and manage their DIDs and keys within the platform using the Web Crypto API, with encrypted private keys stored securely in IndexedDB. Authentication is based on a challenge-response mechanism. All creative contributions are cryptographically linked to the author's DID for immutable attribution.
+Each user's InterNovel identity is anchored to a W3C Decentralized Identifier (DID), utilizing the `did:peer` method. Users generate and manage their DIDs and keys within the platform using the Node.js `crypto` module, with encrypted private keys stored securely. Authentication is based on a challenge-response mechanism. All creative contributions are cryptographically linked to the author's DID for immutable attribution.
 
 ### The "Character Travel trunk": A Novel Collaborative Paradigm
 
@@ -84,34 +84,27 @@ The Internovel Platform is built on a microservices architecture, leveraging clo
 
 ### Component Structure
 
-1. **Frontend & Backend**: Built with Nuxt.js 3 (Vue.js-based), providing a responsive and intuitive user interface and handling server-side logic and API endpoints. The frontend leverages the Vuetify UI framework for componentry and styling. Refer to [Vuetifying.md](Vuetifying.md) for detailed architecture decisions regarding Vuetify.
-2. **Database**: Utilizes Supabase (PostgreSQL) for storing user data, novel metadata, collaboration states, character bios, and feature-specific data.
-3. **Decentralized Identity Layer**: Manages decentralized identity using W3C Decentralized Identifiers (DIDs) and cryptographic operations.
+1.  **Frontend & Backend**: Built with Nuxt.js 3 (Vue.js-based), providing a responsive and intuitive user interface and handling server-side logic and API endpoints. The frontend leverages the Vuetify UI framework for componentry and styling. Refer to [Vuetifying.md](docs/Vuetifying.md) for detailed architecture decisions regarding Vuetify.
+2.  **Database**: Utilizes OrbitDB on Helia IPFS for decentralized data storage. A local PostgreSQL instance serves as a read-optimized cache.
+3.  **Decentralized Identity Layer**: Manages decentralized identity using W3C Decentralized Identifiers (DIDs) and cryptographic operations via the Node.js `crypto` module.
 
 ### Authentication Architecture
 
 The platform uses a combination of traditional authentication methods and decentralized identity solutions. Key components include:
 
-- **OAuth 2.0**: Used for traditional authentication and authorization, specifically for connecting to a variety of external third-party services to enable document storage integration and leveraging external resources.
-- **Decentralized Identifiers (DIDs)**: For managing core user identities and ensuring immutable attribution of contributions, anchored to `did:key` for MVP1.
-- **JWT Tokens**: For secure communication between frontend and backend services.
-- **Web Crypto API**: Used for in-browser key generation and cryptographic operations for DID management.
-- **IndexedDB**: Used for secure storage of encrypted private keys in the browser.
-- **Challenge-Response Mechanism**: For DID-based authentication.
+-   **OAuth 2.0**: Used for traditional authentication and authorization, specifically for connecting to a variety of external third-party services to enable document storage integration and leveraging external resources.
+-   **Decentralized Identifiers (DIDs)**: For managing core user identities and ensuring immutable attribution of contributions, anchored to `did:peer`.
+-   **JWT Tokens**: For secure communication between frontend and backend services.
+-   **Node.js `crypto` module**: Used for key generation and cryptographic operations for DID management.
+-   **Challenge-Response Mechanism**: For DID-based authentication.
 
 ### Database Architecture
 
-The platform employs a PostgreSQL database managed by Supabase.
+The platform employs a dual-database approach:
 
-- **PostgreSQL (Supabase)**: For storing structured data...
-  - Authentication handled via `useSupabaseClient()` composable auto-imported from `@nuxtjs/supabase`
-  - Client initialization occurs in Pinia store actions (signIn, signUp, signOut, fetchUser)
-  - Authentication flow:
-    - Home page loads without signed-in user by default
-    - DID selector dropdown appears on home page for unsigned users
-    - Signed-in users see their avatar and display name in UI (not dropdown)
-    - Last signed-in user is remembered (selected in dropdown but not automatically signed in) for quick re-login
-- **Drizzle ORM**: Used for type-safe schema definition, migrations, and database interactions.
+-   **OrbitDB/Helia IPFS**: The primary, decentralized data store for all user-generated content and application data.
+-   **PostgreSQL**: A local, read-optimized cache synchronized with OrbitDB to provide fast, structured query capabilities.
+-   **Drizzle ORM**: Used for type-safe schema definition, migrations, and interactions with the PostgreSQL cache.
 
 ### API Structure
 

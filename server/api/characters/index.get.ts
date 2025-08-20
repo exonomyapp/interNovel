@@ -1,4 +1,4 @@
-import { db } from '../../db';
+import { db } from '../../utils/db';
 import { characters } from '../../db/schema';
 
 export default defineEventHandler(async (event) => {

@@ -1,4 +1,4 @@
-import { db } from '~/server/db';
+import { db } from '~/server/utils/db';
 import { travelTrunks } from '~/server/db/schema';
 import { eq } from 'drizzle-orm';
 

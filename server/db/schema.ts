@@ -2,13 +2,18 @@ import { pgTable, serial, text, timestamp, varchar, boolean } from 'drizzle-orm/
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
-export const users = pgTable('users', {
+const users = pgTable('users', {
   id: serial('id').primaryKey(),
   did: varchar('did', { length: 256 }).notNull().unique(),
+  publicKey: text('publicKey').notNull(),
+  email: text('email').unique(),
+  name: text('name'),
+  avatarUrl: text('avatar_url'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const characters = pgTable('characters', {
+const characters = pgTable('characters', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 256 }).notNull(),
   bio: text('bio').notNull(),
@@ -17,14 +22,14 @@ export const characters = pgTable('characters', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-export const travelTrunks = pgTable('travel_trunks', {
+const travelTrunks = pgTable('travel_trunks', {
   id: serial('id').primaryKey(),
   characterId: serial('character_id').references(() => characters.id).notNull(),
   narrativeSample: text('narrative_sample').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-export const proposals = pgTable('proposals', {
+const proposals = pgTable('proposals', {
   id: serial('id').primaryKey(),
   proposerId: serial('proposer_id').references(() => users.id).notNull(),
   characterId: serial('character_id').references(() => characters.id).notNull(),
@@ -33,16 +38,16 @@ export const proposals = pgTable('proposals', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-export const insertCharacterSchema = z.object({
+const insertCharacterSchema = z.object({
   name: z.string(),
   bio: z.string(),
   ownerId: z.number(),
   listed: z.boolean().optional()
 });
 
-export const insertTravelTrunkSchema = z.object({
+const insertTravelTrunkSchema = z.object({
   characterId: z.number(),
   narrativeSample: z.string()
 });
 
-export { eq };
+export { users, characters, travelTrunks, proposals, insertCharacterSchema, insertTravelTrunkSchema, eq };

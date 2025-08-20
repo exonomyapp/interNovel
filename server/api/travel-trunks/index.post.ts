@@ -1,4 +1,4 @@
-import { db } from '~/server/db';
+import { db } from '~/server/utils/db';
 import { travelTrunks, insertTravelTrunkSchema } from '~/server/db/schema';
 
 export default defineEventHandler(async (event) => {

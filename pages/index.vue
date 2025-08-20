@@ -2,11 +2,11 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12" md="8">
-        <v-card class="pa-5">
-          <v-card-title class="text-h4 text-center">Welcome to Internovel!</v-card-title>
-          <v-card-text class="text-center">
+        <v-card>
+          <v-card-title>Welcome to Internovel!</v-card-title>
+          <v-card-text>
             <div v-if="!authStore.isLoggedIn">
-              <p class="text-body-1 mb-4">Please sign in to access all features</p>
+              <p>Please sign in to access all features</p>
             </div>
             <div v-if="authStore.isLoggedIn">
               <v-menu offset-y>

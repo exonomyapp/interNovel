@@ -9,13 +9,9 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxtjs/supabase',
-    '@nuxtjs/tailwindcss',
-    '@vueuse/nuxt',
-    ['@pinia/nuxt', {
-      autoImports: ['defineStore', 'acceptHMRUpdate'],
-    }],
+    'vuetify-nuxt-module',
+    '@pinia/nuxt',
   ],
-
 
   runtimeConfig: {
     public: {
@@ -29,4 +25,11 @@ export default defineNuxtConfig({
   },
   css: [],
 
+  nitro: {
+    esbuild: {
+      options: {
+        target: 'es2022',
+      },
+    },
+  },
 })
